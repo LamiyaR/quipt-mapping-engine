@@ -20,13 +20,13 @@ xmlns:xsl=""http://www.w3.org/1999/XSL/Transform"">");
             {
                 if (!string.IsNullOrWhiteSpace(map.QuiptPath))
                 {
-                    sb.AppendLine($"<{map.AmazonField}>");
+                    sb.AppendLine($"<{map.MarketplaceField}>");
                     sb.AppendLine($"  <xsl:value-of select=\"{map.QuiptPath}\"/>");
-                    sb.AppendLine($"</{map.AmazonField}>");
+                    sb.AppendLine($"</{map.MarketplaceField}>");
                 }
                 else if (map.IsRequired)
                 {
-                    sb.AppendLine($"<!-- Unmatched Required Field: {map.AmazonField} -->");
+                    sb.AppendLine($"<!-- Unmatched Required Field: {map.MarketplaceField} -->");
                 }
             }
 

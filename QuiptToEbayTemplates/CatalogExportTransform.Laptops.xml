@@ -1,0 +1,784 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CatalogTemplateRequest.BuilderDetails xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.quipt.com/api">
+  <Attributes>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Type</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='NOTEBOOKFORMFACT']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Brand</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:Brand/q:Name" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Model</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='MODELNBR']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>MPN</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Operating System</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='DESKTOPOS']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:variable name='qOSversion' select="q:Catalog/q:Attributes/q:Attribute[q:Code='DESKTOPOSEDITION']/q:Value/a:string[1]" /&gt;
+
+
+&lt;xsl:choose&gt;
+
+&lt;xsl:when test="$qOSversion='Not Applicable'"&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:otherwise&gt;
+&lt;xsl:text&gt;&amp;#160;&lt;/xsl:text&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='DESKTOPOSEDITION']/q:Value/a:string[1]" /&gt;
+&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Screen Size</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--##.#in.--&gt;
+&lt;xsl:variable name="screenSize" select="q:Catalog/q:Attributes/q:Attribute[q:Code='SCRNSIZE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:value-of select="concat($screenSize, 'in.') "/&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Bundle Listing</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:text&gt;No&lt;/xsl:text&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Processor</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='CPUSERIES']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Processor Speed</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:variable name="cpuSpeed" select="q:Catalog/q:Attributes/q:Attribute[q:Code='CPUSPEED']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt; 
+	&lt;xsl:when test="$cpuSpeed &amp;lt; 1"&gt;
+		&lt;xsl:value-of select="concat($cpuSpeed * 1000 , 'MHz')" /&gt;
+	&lt;/xsl:when&gt;
+
+	&lt;xsl:when test="$cpuSpeed &amp;gt;= 1"&gt;
+		&lt;xsl:value-of select="concat(format-number($cpuSpeed, '0.00'), 'GHz')" /&gt;
+	&lt;/xsl:when&gt;
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>GPU</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='GPUMODEL']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>RAM Size</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:variable name="ram" select="q:Catalog/q:Attributes/q:Attribute[q:Code='RAMSIZE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt; 
+	&lt;xsl:when test="$ram &amp;lt; 1"&gt;
+		&lt;xsl:value-of select="concat($ram * 1000 , 'MB')" /&gt;
+	&lt;/xsl:when&gt;
+
+	&lt;xsl:when test="$ram &amp;gt;= 1"&gt;
+		&lt;xsl:value-of select="concat(format-number($ram, '#.#'), 'GB')" /&gt;
+	&lt;/xsl:when&gt;
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Storage Type</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='HDTYPEHWARE']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Hard Drive Capacity</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:variable name="size" select="q:Catalog/q:Attributes/q:Attribute[q:Code='HDSIZE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt; 
+	&lt;xsl:when test="$size &amp;gt;= 1000"&gt;
+		&lt;xsl:value-of select="concat(format-number($size div 1000, '#.#'), 'TB')" /&gt;
+	&lt;/xsl:when&gt;
+
+	&lt;xsl:when test="$size &amp;gt;= 1"&gt;
+		&lt;xsl:value-of select="concat(format-number($size, '#.#'), 'GB')" /&gt;
+	&lt;/xsl:when&gt;
+
+	&lt;xsl:when test="$size &amp;lt; 1"&gt;
+		&lt;xsl:value-of select="concat($size * 1000 , 'MB')" /&gt;
+	&lt;/xsl:when&gt;
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>SSD Capacity</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:variable name="type" select="q:Catalog/q:Attributes/q:Attribute[q:Code='HDTYPEHWARE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="size" select="q:Catalog/q:Attributes/q:Attribute[q:Code='HDSIZE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt; 
+	&lt;xsl:when test="contains($type, 'HDD') "&gt;
+		&lt;xsl:text&gt;Not Applicable&lt;/xsl:text&gt;
+	&lt;/xsl:when&gt;
+	
+	&lt;xsl:when test="$size &amp;gt;= 1000"&gt;
+		&lt;xsl:value-of select="concat(format-number($size div 1000, '#.#'), 'TB')" /&gt;
+	&lt;/xsl:when&gt;
+
+	&lt;xsl:when test="$size &amp;gt;= 1"&gt;
+		&lt;xsl:value-of select="concat(format-number($size, '#.#'), 'GB')" /&gt;
+	&lt;/xsl:when&gt;
+
+	&lt;xsl:when test="$size &amp;lt; 1"&gt;
+		&lt;xsl:value-of select="concat($size * 1000 , 'MB')" /&gt;
+	&lt;/xsl:when&gt;
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Release Year</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='RELEASEYEAR']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Color</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name='qColor' select="q:Catalog/q:Attributes/q:Attribute[q:Code='GENERICCOLOR']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt;
+
+&lt;xsl:when test="$qColor='Grey'"&gt;
+&lt;xsl:text&gt;Gray&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:otherwise&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='GENERICCOLOR']/q:Value/a:string[1]" /&gt;
+&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Connectivity</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:variable name="displayPort" select="q:Catalog/q:Attributes/q:Attribute[q:Code='TOTALDSLPRT']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="dvi" select="q:Catalog/q:Attributes/q:Attribute[q:Code='TOTALDVI']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="lan" select="q:Catalog/q:Attributes/q:Attribute[q:Code='LANPORT']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="hdmi" select="q:Catalog/q:Attributes/q:Attribute[q:Code='HDMI']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="headphone" select="q:Catalog/q:Attributes/q:Attribute[q:Code='HDPHNJACK']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="usb2" select="q:Catalog/q:Attributes/q:Attribute[q:Code='USBPRT']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="usb3" select="q:Catalog/q:Attributes/q:Attribute[q:Code='USBPWR']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="usbC" select="q:Catalog/q:Attributes/q:Attribute[q:Code='USBCPORTS']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="vga" select="q:Catalog/q:Attributes/q:Attribute[q:Code='VGA']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:variable name="outputFragmentCollection"&gt;
+	
+	&lt;xsl:if test="$displayPort &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$displayPort" /&gt;
+			 &lt;xsl:text&gt; DisplayPort&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$displayPort &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$dvi &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$dvi" /&gt;
+			 &lt;xsl:text&gt; DVI output&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$dvi &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+
+	
+	&lt;xsl:if test="$lan &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$lan" /&gt;
+			 &lt;xsl:text&gt; lan port&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$lan &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$hdmi &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$hdmi" /&gt;
+			 &lt;xsl:text&gt; HDMI port&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$hdmi &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+		
+	&lt;xsl:if test="$headphone &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$headphone" /&gt;
+			 &lt;xsl:text&gt; Headphone Jack&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$headphone &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+	
+	
+	&lt;xsl:if test="$usb2 &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$usb2" /&gt;
+			 &lt;xsl:text&gt; USB 2.0 port&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$usb2 &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$usb3 &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$usb3" /&gt;
+			 &lt;xsl:text&gt; USB 3.0 port&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$usb3 &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+
+	&lt;xsl:if test="$usbC &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$usbC" /&gt;
+			 &lt;xsl:text&gt; USB C port&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$usbC &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$vga &amp;gt; 0"&gt;
+		&lt;data&gt;
+			 &lt;xsl:value-of select="$vga" /&gt;
+			 &lt;xsl:text&gt; VGA port&lt;/xsl:text&gt;
+			 &lt;xsl:if test="$vga &amp;gt; 1"&gt;
+				&lt;xsl:text&gt;s&lt;/xsl:text&gt;
+			 &lt;/xsl:if&gt;
+		&lt;/data&gt;
+	&lt;/xsl:if&gt;
+&lt;/xsl:variable&gt;
+
+
+	&lt;xsl:for-each select="msxsl:node-set($outputFragmentCollection)/*[. != '']"&gt;
+		&lt;xsl:if test="position() &amp;gt; 1"&gt;&lt;xsl:text&gt;|&lt;/xsl:text&gt;&lt;/xsl:if&gt;
+		&lt;xsl:value-of select="."/&gt;
+
+	&lt;/xsl:for-each&gt;
+</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Features</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:variable name="batteryLife" select="q:Catalog/q:Attributes/q:Attribute[q:Code='BATLIFE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="batteryType" select="q:Catalog/q:Attributes/q:Attribute[q:Code='BATTYPE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="displayType" select="q:Catalog/q:Attributes/q:Attribute[q:Code='DSPLYTYPE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="resolution" select="q:Catalog/q:Attributes/q:Attribute[q:Code='MAXRES']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="screenSize" select="q:Catalog/q:Attributes/q:Attribute[q:Code='SCRNSIZE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="epeat" select="q:Catalog/q:Attributes/q:Attribute[q:Code='EPEATLVL']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="backlitKeyboard" select="q:Catalog/q:Attributes/q:Attribute[q:Code='LITKEY']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="builtinSpeakers" select="q:Catalog/q:Attributes/q:Attribute[q:Code='BLTINSPKRS']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="builtinMic" select="q:Catalog/q:Attributes/q:Attribute[q:Code='MIC']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="camRes" select="q:Catalog/q:Attributes/q:Attribute[q:Code='CAMRES']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="fingerprintReader" select="q:Catalog/q:Attributes/q:Attribute[q:Code='FINGERRDR']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="opticalDrive" select="q:Catalog/q:Attributes/q:Attribute[q:Code='OPTDR1']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="bluetoothVer" select="q:Catalog/q:Attributes/q:Attribute[q:Code='BLUETOOTHVER']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="touchscreen" select="q:Catalog/q:Attributes/q:Attribute[q:Code='TOUCH']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="cpuCores" select="q:Catalog/q:Attributes/q:Attribute[q:Code='CPUCORE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="cpuCache" select="q:Catalog/q:Attributes/q:Attribute[q:Code='CPUCACHE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="cpuSpeed" select="q:Catalog/q:Attributes/q:Attribute[q:Code='CPUSPEED']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="cpuNumber" select="q:Catalog/q:Attributes/q:Attribute[q:Code='CPUNUM']/q:Value/a:string[1]" /&gt;
+&lt;xsl:variable name="wifi" select="q:Catalog/q:Attributes/q:Attribute[q:Code='WIFICOMPAT']/q:Value/a:string[1]" /&gt;
+
+
+
+&lt;xsl:variable name="cpuCoresPhrasing" &gt;
+	&lt;xsl:choose&gt; 
+		&lt;xsl:when test="$cpuCores='1'"&gt;
+		&lt;xsl:text&gt;Single-core &lt;/xsl:text&gt;
+		&lt;/xsl:when&gt;
+
+		&lt;xsl:when test="$cpuCores='2'"&gt;
+		&lt;xsl:text&gt;Dual-core &lt;/xsl:text&gt;
+		&lt;/xsl:when&gt;
+		
+		&lt;xsl:when test="$cpuCores='3'"&gt;
+		&lt;xsl:text&gt;Triple-core &lt;/xsl:text&gt;
+		&lt;/xsl:when&gt;
+
+		&lt;xsl:when test="$cpuCores='4'"&gt;
+		&lt;xsl:text&gt;Quad-core &lt;/xsl:text&gt;
+		&lt;/xsl:when&gt;
+
+		&lt;xsl:when test="$cpuCores='6'"&gt;
+		&lt;xsl:text&gt;6-core &lt;/xsl:text&gt;
+		&lt;/xsl:when&gt;
+
+		&lt;xsl:when test="$cpuCores='8'"&gt;
+		&lt;xsl:text&gt;8-core &lt;/xsl:text&gt;
+		&lt;/xsl:when&gt;
+	&lt;/xsl:choose&gt;
+&lt;/xsl:variable&gt;
+
+&lt;xsl:variable name="cpuCachePhrasing" &gt;
+&lt;xsl:choose&gt; 
+		&lt;xsl:when test="$cpuCache &amp;gt; 0 and $cpuCache &amp;lt; 1"&gt;
+		&lt;xsl:value-of select="concat(' w/ ', $cpuCache * 1000, ' KB cache')" /&gt;
+		&lt;/xsl:when&gt;
+		
+		&lt;xsl:when test="$cpuCache &amp;gt;= 1"&gt;
+		&lt;xsl:value-of select="concat(' w/ ', $cpuCache, ' MB cache')" /&gt;
+		&lt;/xsl:when&gt;
+	&lt;/xsl:choose&gt;
+&lt;/xsl:variable&gt;
+
+&lt;xsl:variable name="outputFragmentCollection"&gt;
+	&lt;xsl:if test="$touchscreen = 'YES'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Touchscreen'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+		
+	&lt;xsl:if test="$backlitKeyboard = 'YES'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Backlit Keyboard'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;	
+		&lt;xsl:if test="$camRes &amp;gt; 0"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Built-In Webcam'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$wifi != 'Not Applicable'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Built-in Wi-Fi Adapter'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$builtinSpeakers = 'YES'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Built-in Speakers'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$batteryLife &amp;gt; 0"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="concat($batteryLife, '-hour ', $batteryType, ' battery')" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+	&lt;Value&gt;
+		 &lt;xsl:value-of select="concat($resolution, ' ', $screenSize, ' inch ', $displayType, ' display')" /&gt;
+	&lt;/Value&gt;
+
+	&lt;xsl:if test="$epeat != 'Not Applicable'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="concat('EPEAT ', $epeat, ' certified energy efficient')" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$builtinMic = 'YES'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Built-In Microphone'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+
+	&lt;xsl:if test="$fingerprintReader = 'YES'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Biometric Security (Fingerprint Reader) Included'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+
+	
+	&lt;xsl:if test="$opticalDrive != 'Not Applicable'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="$opticalDrive" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;xsl:if test="$bluetoothVer != 'No Bluetooth'"&gt;
+		&lt;Value&gt;
+			 &lt;xsl:value-of select="'Built-in Bluetooth Adapter'" /&gt;
+		&lt;/Value&gt;
+	&lt;/xsl:if&gt;
+	
+	&lt;Value&gt;
+	    &lt;!--2.4 GHz Dual-core A123M processor--&gt;
+		&lt;!--3.6 GHz Quad-core i5-3450 processor with 5 MB cache--&gt;
+		&lt;xsl:value-of select="concat($cpuSpeed, ' GHz ', $cpuCoresPhrasing, ' ', $cpuNumber, ' cpu', $cpuCachePhrasing)" /&gt;
+	&lt;/Value&gt;
+&lt;/xsl:variable&gt;
+
+
+&lt;xsl:for-each select="msxsl:node-set($outputFragmentCollection)/*[. != '']"&gt;
+	&lt;xsl:if test="position() &amp;gt; 1"&gt;&lt;xsl:text&gt;|&lt;/xsl:text&gt;&lt;/xsl:if&gt;
+	&lt;xsl:value-of select="."/&gt;
+&lt;/xsl:for-each&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Maximum Resolution</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='MAXRES']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Graphics Processing Type</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext, recommendations include 
+Dedicated Graphics
+Integrated/On-Board Graphics
+Hybrid Graphics
+Dedizierte Grafik
+Integrierte Grafik
+Hybrid-Grafik--&gt;
+
+&lt;!--Dedicated|Integrated|Hybrid--&gt;
+&lt;xsl:variable name="gpuType"
+select="q:Catalog/q:Attributes/q:Attribute[q:Code='GPUTYPE']/q:Value/a:string[1]" /&gt;
+
+
+&lt;xsl:variable name="map"&gt;
+&lt;item code="Dedicated"&gt;Dedicated Graphics&lt;/item&gt;
+&lt;item code="Dedicated"&gt;Dedizierte Grafik&lt;/item&gt;
+&lt;item code="Integrated"&gt;Integrated/On-Board Graphics&lt;/item&gt;
+&lt;item code="Integrated"&gt;Integrierte Grafik&lt;/item&gt;
+&lt;item code="Hybrid"&gt;Hybrid Graphics&lt;/item&gt;
+&lt;item code="Hybrid"&gt;Hybrid-Grafik&lt;/item&gt;
+&lt;/xsl:variable&gt;
+
+&lt;xsl:value-of select="msxsl:node-set($map)/item[@code=$gpuType]"/&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Series</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='NOTEBOOKPRODLINE']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Most Suitable For</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name="qLifestyle" select="q:Catalog/q:Attributes/q:Attribute[q:Code='PCLIFESTYLE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:variable name="qGraphics" select="q:Catalog/q:Attributes/q:Attribute[q:Code='GPUTYPE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt; 
+&lt;xsl:when test="$qLifestyle='Business'"&gt;
+&lt;xsl:text&gt;Workstation&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="$qLifestyle='Entertainment'"&gt;
+&lt;xsl:text&gt;Casual Computing&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="$qLifestyle='All-in-One' and $qGraphics = 'Dedicated' "&gt;
+&lt;xsl:text&gt;Graphics Design&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="$qLifestyle='All-in-One' and $qGraphics != 'Dedicated' "&gt;
+&lt;xsl:text&gt;Casual Computing&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="$qLifestyle='Gaming'"&gt;
+&lt;xsl:text&gt;Gaming&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="$qLifestyle='Education' and $qGraphics = 'Dedicated' "&gt;
+&lt;xsl:text&gt;Graphics Design&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="$qLifestyle='Education' and $qGraphics != 'Dedicated' "&gt;
+&lt;xsl:text&gt;Casual Computing&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Item Height</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value> &lt;xsl:if test="normalize-space(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string)!=''"&gt;
+      &lt;xsl:value-of select="normalize-space(substring-before(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string,'x'))"/&gt;
+    &lt;/xsl:if&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Item Length</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:if test="normalize-space(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string)!=''"&gt;
+      &lt;xsl:value-of select="normalize-space(substring-before(substring-after(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string,'x'),'x'))"/&gt;
+    &lt;/xsl:if&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Item Width</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:if test="normalize-space(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string)!=''"&gt;
+      &lt;xsl:value-of select="normalize-space(substring-after(substring-after(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string,'x'),'x'))"/&gt;
+    &lt;/xsl:if&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Unit Quantity</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMWEIGHT']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Unit Type</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:text&gt;LBS&lt;/xsl:text&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+  </Attributes>
+  <Global>
+    <CatalogTemplateRequest.Property>
+      <Key>CategoryId</Key>
+      <Value>177</Value>
+    </CatalogTemplateRequest.Property>
+    <CatalogTemplateRequest.Property>
+      <Key>Condition</Key>
+      <Value></Value>
+    </CatalogTemplateRequest.Property>
+    <CatalogTemplateRequest.Property>
+      <Key>Filter</Key>
+      <Value>&lt;xsl:if test="q:Catalog/q:Manufacturer/q:Name != 'Apple'"&gt;1&lt;/xsl:if&gt;</Value>
+    </CatalogTemplateRequest.Property>
+  </Global>
+  <HasVariantManager>false</HasVariantManager>
+  <Variants />
+</CatalogTemplateRequest.BuilderDetails>

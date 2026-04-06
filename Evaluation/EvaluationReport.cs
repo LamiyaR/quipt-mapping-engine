@@ -5,7 +5,7 @@ public class EvaluationReport
     public string Category { get; set; } = "";
 
     // Overall accuracy (computed over ground-truth fields only)
-    public int TotalAmazonFields { get; set; }
+    public int TotalMarketplaceFields { get; set; }
     public int CorrectMatches { get; set; }
     public int GroundTruthFields { get; set; }
     public double AccuracyPercent { get; set; }

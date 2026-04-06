@@ -1,6 +1,6 @@
 public class MappingResult
 {
-    public string AmazonField { get; set; } = "";
+    public string MarketplaceField { get; set; } = "";
     public string? QuiptCode
     {
         get

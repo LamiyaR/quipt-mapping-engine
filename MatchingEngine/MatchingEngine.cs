@@ -25,18 +25,45 @@ public class MatchingEngine
 
     public List<MappingResult> Match(
         List<Field> quiptFields,
-        List<Field> amazonFields,
-        string category = "")
+        List<Field> marketplaceFields,
+        string category = "",
+        string marketplace = "amazon")
     {
+        // Alias table now markets amazon fields too (backward compatible)
+        var amazonFields = marketplaceFields;
+
         var results = new List<MappingResult>();
         var usedQuiptPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         // ── Phase 3: Pre-assign aliases before heuristic matching ──
-        var aliases = FieldAliasTable.GetAliases(category);
+        var pathAliases = FieldAliasTable.GetPathAliases(marketplace);
+        var aliases = FieldAliasTable.GetAliases(marketplace, category);
         var aliasResults = new Dictionary<string, MappingResult>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var amazon in amazonFields)
         {
+            // ── 3a. Direct path alias (structural elements with no Code) ──
+            if (pathAliases.TryGetValue(amazon.Name, out var exactPath))
+            {
+                var quiptMatch = quiptFields.FirstOrDefault(q =>
+                    q.Path != null && q.Path.EndsWith(exactPath, StringComparison.OrdinalIgnoreCase));
+
+                if (quiptMatch != null)
+                {
+                    aliasResults[amazon.Name] = new MappingResult
+                    {
+                        MarketplaceField = amazon.Name,
+                        QuiptPath = quiptMatch.Path,
+                        Score = 1.0,
+                        IsRequired = amazon.IsRequired,
+                        IsUnmatched = false
+                    };
+                    usedQuiptPaths.Add(quiptMatch.Path);
+                    continue;
+                }
+            }
+
+            // ── 3b. Code-based alias ──
             if (aliases.TryGetValue(amazon.Name, out var quiptCode))
             {
                 // Find the Quipt field with this Code in its path
@@ -47,7 +74,7 @@ public class MatchingEngine
                 {
                     aliasResults[amazon.Name] = new MappingResult
                     {
-                        AmazonField = amazon.Name,
+                        MarketplaceField = amazon.Name,
                         QuiptPath = quiptMatch.Path,
                         Score = 1.0,
                         IsRequired = amazon.IsRequired,
@@ -139,7 +166,7 @@ public class MatchingEngine
 
             results.Add(new MappingResult
             {
-                AmazonField = amazon.Name,
+                MarketplaceField = amazon.Name,
                 QuiptPath = isUnmatched ? null : bestMatch!.Path,
                 Score = Math.Round(bestScore, 4),
                 IsRequired = amazon.IsRequired,

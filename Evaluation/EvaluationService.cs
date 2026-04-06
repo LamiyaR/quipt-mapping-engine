@@ -5,7 +5,7 @@ namespace QuiptMappingEngine.Evaluation;
 public static class EvaluationService
 {
     // We compare auto results vs ground truth (manual mapping)
-    // Ground truth format: AmazonFieldName -> Correct QuiptXPath
+    // Ground truth format: MarketplaceFieldName -> Correct QuiptXPath
     public static EvaluationReport Evaluate(
         string category,
         List<EvaluatedMapping> autoMappings,
@@ -26,7 +26,7 @@ public static class EvaluationService
         // Only count ground truth entries that match an actual Amazon field name.
         // The XSLT extractor may pick up nested/structural tags that aren't real fields.
         var amazonKeys = new HashSet<string>(
-            autoMappings.Select(m => CanonKey(m.AmazonFieldName)),
+            autoMappings.Select(m => CanonKey(m.MarketplaceFieldName)),
             StringComparer.OrdinalIgnoreCase);
         var matchableTruth = truthByKey.Keys.Where(k => amazonKeys.Contains(k)).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -40,7 +40,7 @@ public static class EvaluationService
 
         foreach (var m in autoMappings)
         {
-            var key = CanonKey(m.AmazonFieldName);
+            var key = CanonKey(m.MarketplaceFieldName);
 
             // Required coverage stats
             if (m.IsRequired)
@@ -49,7 +49,7 @@ public static class EvaluationService
                 if (!string.IsNullOrWhiteSpace(m.MatchedQuiptXPath))
                     matchedRequired++;
                 else
-                    unmatchedRequired.Add(m.AmazonFieldName);
+                    unmatchedRequired.Add(m.MarketplaceFieldName);
             }
 
             // Accuracy stats: only count as correct if it matches ground truth
@@ -67,7 +67,7 @@ public static class EvaluationService
         {
             Category = category,
 
-            TotalAmazonFields = total,
+            TotalMarketplaceFields = total,
             CorrectMatches = correct,
             GroundTruthFields = groundTruthCount,
             // Accuracy over ground-truth fields only (meaningful %)

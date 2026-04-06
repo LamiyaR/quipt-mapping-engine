@@ -5,7 +5,8 @@ namespace QuiptMappingEngine.Models
     public class ApiResponseModel
     {
         public string Category { get; set; } = "";
-        public int AmazonFieldCount { get; set; }
+        public string Marketplace { get; set; } = "";
+        public int MarketplaceFieldCount { get; set; }
         public int QuiptFieldCount { get; set; }
         public int MappingCount { get; set; }
         public double Accuracy { get; set; }
@@ -21,7 +22,7 @@ namespace QuiptMappingEngine.Models
 
     public class MappingEvalDetail
     {
-        public string AmazonField { get; set; } = "";
+        public string MarketplaceField { get; set; } = "";
         public bool IsRequired { get; set; }
         public string? AutoMatchedPath { get; set; }
         public double Score { get; set; }
