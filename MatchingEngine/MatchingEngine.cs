@@ -7,8 +7,8 @@ namespace QuiptMappingEngine.Services;
 
 public class MatchingEngine
 {
-    // Minimum score to accept a match (avoids garbage matches)
-    private const double MinThreshold = 0.20;
+    // Minimum score to accept a match (raised from 0.20 to cut garbage matches)
+    private const double MinThreshold = 0.25;
 
     // Generic leaf names that should be penalized — they match too many things
     private static readonly HashSet<string> GenericLeaves = new(StringComparer.OrdinalIgnoreCase)
@@ -25,10 +25,41 @@ public class MatchingEngine
 
     public List<MappingResult> Match(
         List<Field> quiptFields,
-        List<Field> amazonFields)
+        List<Field> amazonFields,
+        string category = "")
     {
         var results = new List<MappingResult>();
         var usedQuiptPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // ── Phase 3: Pre-assign aliases before heuristic matching ──
+        var aliases = FieldAliasTable.GetAliases(category);
+        var aliasResults = new Dictionary<string, MappingResult>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var amazon in amazonFields)
+        {
+            if (aliases.TryGetValue(amazon.Name, out var quiptCode))
+            {
+                // Find the Quipt field with this Code in its path
+                var quiptMatch = quiptFields.FirstOrDefault(q =>
+                    q.Path != null && q.Path.Contains($"Code='{quiptCode}'"));
+
+                if (quiptMatch != null)
+                {
+                    aliasResults[amazon.Name] = new MappingResult
+                    {
+                        AmazonField = amazon.Name,
+                        QuiptPath = quiptMatch.Path,
+                        Score = 1.0,
+                        IsRequired = amazon.IsRequired,
+                        IsUnmatched = false
+                    };
+
+                    // Only consume the Quipt field if it's NOT in the multi-map whitelist
+                    if (!FieldAliasTable.MultiMapCodes.Contains(quiptCode))
+                        usedQuiptPaths.Add(quiptMatch.Path);
+                }
+            }
+        }
 
         // Pre-compute normalized tokens for all Quipt fields (name + path context)
         var quiptTokensCache = quiptFields.ToDictionary(
@@ -49,6 +80,13 @@ public class MatchingEngine
 
         foreach (var amazon in sortedAmazon)
         {
+            // If this field was already handled by an alias, use that result
+            if (aliasResults.TryGetValue(amazon.Name, out var aliasResult))
+            {
+                results.Add(aliasResult);
+                continue;
+            }
+
             double bestScore = -1;
             Field? bestMatch = null;
 
@@ -56,9 +94,20 @@ public class MatchingEngine
 
             foreach (var quipt in quiptFields)
             {
-                // Skip already-used Quipt fields (1:1 matching)
-                if (usedQuiptPaths.Contains(quipt.Path))
-                    continue;
+                // Skip already-used Quipt fields (1:1 matching) unless multi-map whitelisted
+                if (usedQuiptPaths.Contains(quipt.Path!))
+                {
+                    // Check if this Quipt field's code is in the multi-map whitelist
+                    var codeMatch = Regex.Match(quipt.Path ?? "", @"Code='([^']+)'");
+                    if (codeMatch.Success && FieldAliasTable.MultiMapCodes.Contains(codeMatch.Groups[1].Value))
+                    {
+                        // Allow it through — multi-map field
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
 
                 var qTokens = quiptTokensCache[quipt];
                 var specificity = quiptSpecificity[quipt];
@@ -75,7 +124,18 @@ public class MatchingEngine
             bool isUnmatched = bestMatch == null || bestScore < MinThreshold;
 
             if (!isUnmatched)
-                usedQuiptPaths.Add(bestMatch!.Path);
+            {
+                // Only consume the Quipt field if it's NOT in the multi-map whitelist
+                var codeMatch = Regex.Match(bestMatch!.Path ?? "", @"Code='([^']+)'");
+                if (codeMatch.Success && FieldAliasTable.MultiMapCodes.Contains(codeMatch.Groups[1].Value))
+                {
+                    // Don't add to usedQuiptPaths — allow reuse
+                }
+                else
+                {
+                    usedQuiptPaths.Add(bestMatch!.Path!);
+                }
+            }
 
             results.Add(new MappingResult
             {
@@ -95,15 +155,15 @@ public class MatchingEngine
     {
         double score = 0;
 
-        // ── 1. Token overlap (Jaccard) ── primary signal, weight: 0.45
+        // ── 1. Token overlap (Jaccard) ── primary signal, weight: 0.35 (was 0.45)
         var tokenOverlap = ComputeTokenOverlap(aTokens, qTokens);
-        score += tokenOverlap * 0.45;
+        score += tokenOverlap * 0.35;
 
-        // ── 2. Weighted token match ── bonus for matching MORE tokens (not just ratio)
+        // ── 2. Weighted token match ── weight: 0.30 (was 0.20)
         // This helps when amazon has 2 tokens and quipt has 5 — Jaccard is low but 2/2 match
         var matchCount = aTokens.Count(t => qTokens.Contains(t));
         var matchRatio = aTokens.Count > 0 ? (double)matchCount / aTokens.Count : 0;
-        score += matchRatio * 0.20;
+        score += matchRatio * 0.30;
 
         // ── 3. Levenshtein similarity on collapsed normalized strings ── weight: 0.15
         var aNorm = string.Join("", aTokens);

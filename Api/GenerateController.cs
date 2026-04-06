@@ -49,7 +49,7 @@ namespace QuiptMappingEngine.Api
 
             // 3) Matching engine (Purvika module)
             var matcher = new MatchingEngine();
-            var mappings = matcher.Match(quiptFields, amazonFields);
+            var mappings = matcher.Match(quiptFields, amazonFields, request.Category.ToLower());
 
             // 4) Evaluation — extract ground truth from manual XSLT
             var groundTruth = new Dictionary<string, string>();
@@ -119,6 +119,14 @@ namespace QuiptMappingEngine.Api
                 evalDetails.Add(detail);
             }
 
+            // Sort: required first, then optional; within each group matched before
+            // unmatched, then by score descending so best matches rise to the top.
+            var sortedMappings = mappings
+                .OrderByDescending(m => m.IsRequired)
+                .ThenBy(m => m.IsUnmatched)
+                .ThenByDescending(m => m.Score)
+                .ToList();
+
             // Response model
             var response = new ApiResponseModel
             {
@@ -127,12 +135,13 @@ namespace QuiptMappingEngine.Api
                 QuiptFieldCount = quiptFields.Count,
                 MappingCount = mappings.Count(m => !m.IsUnmatched),
                 Accuracy = Math.Round(accuracy, 2),
+                CoveragePercent = Math.Round(report.CoveragePercent, 2),
                 RequiredFieldCoverage = Math.Round(requiredCoverage, 2),
-                GroundTruthCount = groundTruth.Count,
+                GroundTruthCount = report.GroundTruthFields,
                 CorrectMatches = report.CorrectMatches,
                 UnmatchedRequiredFields = report.UnmatchedRequiredFields,
                 GeneratedXslt = xslt,
-                Mappings = mappings,
+                Mappings = sortedMappings,
                 EvaluationDetails = evalDetails
             };
 

@@ -9,6 +9,7 @@ namespace QuiptMappingEngine.Models
         public int QuiptFieldCount { get; set; }
         public int MappingCount { get; set; }
         public double Accuracy { get; set; }
+        public double CoveragePercent { get; set; }
         public double RequiredFieldCoverage { get; set; }
         public int GroundTruthCount { get; set; }
         public int CorrectMatches { get; set; }

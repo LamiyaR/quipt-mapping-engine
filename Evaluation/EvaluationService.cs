@@ -14,11 +14,21 @@ public static class EvaluationService
     {
         // Build a version of ground truth with "cleaned keys"
         // so item_weight and itemWeight still match each other.
-        var truthByKey = groundTruth.ToDictionary(
-            kvp => CanonKey(kvp.Key),
-            kvp => kvp.Value,
-            StringComparer.OrdinalIgnoreCase
-        );
+        // Use first-wins to handle duplicate keys after canonicalization.
+        var truthByKey = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var kvp in groundTruth)
+        {
+            var canon = CanonKey(kvp.Key);
+            if (!truthByKey.ContainsKey(canon))
+                truthByKey[canon] = kvp.Value;
+        }
+
+        // Only count ground truth entries that match an actual Amazon field name.
+        // The XSLT extractor may pick up nested/structural tags that aren't real fields.
+        var amazonKeys = new HashSet<string>(
+            autoMappings.Select(m => CanonKey(m.AmazonFieldName)),
+            StringComparer.OrdinalIgnoreCase);
+        var matchableTruth = truthByKey.Keys.Where(k => amazonKeys.Contains(k)).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         int total = autoMappings.Count;
         int correct = 0;
@@ -50,13 +60,20 @@ public static class EvaluationService
             }
         }
 
+        int groundTruthCount = matchableTruth.Count;
+        int matched = autoMappings.Count(m => !string.IsNullOrWhiteSpace(m.MatchedQuiptXPath));
+
         return new EvaluationReport
         {
             Category = category,
 
             TotalAmazonFields = total,
             CorrectMatches = correct,
-            AccuracyPercent = total == 0 ? 0 : (double)correct / total * 100.0,
+            GroundTruthFields = groundTruthCount,
+            // Accuracy over ground-truth fields only (meaningful %)
+            AccuracyPercent = groundTruthCount == 0 ? 0 : (double)correct / groundTruthCount * 100.0,
+            // Coverage: how many Amazon fields got any match at all
+            CoveragePercent = total == 0 ? 0 : (double)matched / total * 100.0,
 
             TotalRequiredFields = totalRequired,
             MatchedRequiredFields = matchedRequired,
