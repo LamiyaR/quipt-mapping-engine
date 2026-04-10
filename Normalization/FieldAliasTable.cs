@@ -1,21 +1,23 @@
 namespace QuiptMappingEngine.Normalization;
 
 /// <summary>
-/// Direct Amazon→Quipt Code overrides for fields where naming conventions
+/// Direct marketplace→Quipt Code overrides for fields where naming conventions
 /// are irreconcilably different and heuristic matching cannot bridge the gap.
 /// Checked BEFORE heuristic scoring in the MatchingEngine.
 /// </summary>
 public static class FieldAliasTable
 {
-    // Universal aliases that apply to all categories.
-    private static readonly Dictionary<string, string> Universal = new(StringComparer.OrdinalIgnoreCase)
+    // ── Amazon aliases ──────────────────────────────────────────────────────
+
+    // Universal Amazon aliases that apply to all categories.
+    private static readonly Dictionary<string, string> AmazonUniversal = new(StringComparer.OrdinalIgnoreCase)
     {
         ["connectivity_technology"] = "HDTYPE",
         ["model_year"] = "RELEASEYEAR",
     };
 
-    // Category-specific overrides (key = Amazon field name, value = Quipt attribute Code).
-    private static readonly Dictionary<string, Dictionary<string, string>> CategoryAliases =
+    // Amazon category-specific overrides (key = Amazon field name, value = Quipt attribute Code).
+    private static readonly Dictionary<string, Dictionary<string, string>> AmazonCategoryAliases =
         new(StringComparer.OrdinalIgnoreCase)
     {
         ["laptops"] = new(StringComparer.OrdinalIgnoreCase)
@@ -57,22 +59,109 @@ public static class FieldAliasTable
         },
     };
 
-    /// <summary>
-    /// Returns the merged alias table for a given category (universal + category-specific).
-    /// Key = Amazon field name (lowercase), Value = Quipt attribute Code (e.g. "GPUMODEL").
-    /// </summary>
-    public static Dictionary<string, string> GetAliases(string category)
-    {
-        var result = new Dictionary<string, string>(Universal, StringComparer.OrdinalIgnoreCase);
+    // ── eBay aliases ────────────────────────────────────────────────────────
 
-        if (CategoryAliases.TryGetValue(category.ToLowerInvariant(), out var catAliases))
+    // Universal eBay aliases (apply to all eBay categories).
+    // eBay path-based aliases: field name → exact Quipt XPath (for structural elements with no Code).
+    // Used when the target path is not an Attribute Code but a direct element path.
+    private static readonly Dictionary<string, string> EbayPathAliases = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Brand"] = "q:Catalog/q:Brand/q:Name",
+    };
+
+    private static readonly Dictionary<string, string> EbayUniversal = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Release Year"]  = "RELEASEYEAR",
+        ["Model"]         = "MODELNBR",
+        ["Color"]         = "GENERICCOLOR",
+        ["RAM Size"]      = "RAMSIZE",
+        ["Storage Type"]  = "HDTYPEHWARE",
+        ["Most Suitable For"] = "PCLIFESTYLE",
+    };
+
+    // eBay category-specific overrides.
+    private static readonly Dictionary<string, Dictionary<string, string>> EbayCategoryAliases =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["laptops"] = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Type"]                     = "NOTEBOOKFORMFACT",
+            ["GPU"]                      = "GPUMODEL",
+            ["Screen Size"]              = "SCRNSIZE",
+            ["Hard Drive Capacity"]      = "HDSIZE",
+            ["SSD Capacity"]             = "HDTYPEHWARE",
+            ["Graphics Processing Type"] = "GPUTYPE",
+            ["Most Suitable For"]        = "PCLIFESTYLE",
+            ["Series"]                   = "NOTEBOOKPRODLINE",
+            ["Connectivity"]             = "TOTALDSLPRT",
+        },
+
+        ["desktops"] = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Form Factor"]              = "DESKTOPFORMFACT",
+            ["GPU"]                      = "GPUMODEL",
+            ["Graphics Processing Type"] = "GPUTYPE",
+            ["Hard Drive Capacity"]      = "HDSIZE",
+            ["SSD Capacity"]             = "HDTYPEHWARE",
+            ["Maximum RAM Capacity"]     = "RAMMAX",
+            ["Most Suitable For"]        = "PCLIFESTYLE",
+            ["Series"]                   = "DESKTOPPRODLINE",
+            ["Connectivity"]             = "TOTALDVI",
+        },
+
+        ["smartphones"] = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Storage Capacity"]  = "STORSIZE",
+            ["Screen Size"]       = "SCRNSIZE",
+            ["Camera Resolution"] = "REARCAM",
+            ["Lock Status"]       = "LOCKEDUNLOCKED",
+            ["SIM Card Slot"]     = "DUALSIM",
+            ["Cellular Band"]     = "CELLULARNETWORK",
+            ["Model Number"]      = "SPMFG",
+        },
+    };
+
+    // ── Public API ──────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Returns path-based aliases for the given marketplace.
+    /// Key = marketplace field name, Value = exact Quipt XPath (for structural paths without a Code).
+    /// </summary>
+    public static Dictionary<string, string> GetPathAliases(string marketplace)
+    {
+        if (marketplace.Equals("ebay", StringComparison.OrdinalIgnoreCase))
+            return EbayPathAliases;
+        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Returns the merged alias table for a given marketplace + category.
+    /// Key = marketplace field name, Value = Quipt attribute Code (e.g. "GPUMODEL").
+    /// Defaults to amazon if marketplace is unrecognised.
+    /// </summary>
+    public static Dictionary<string, string> GetAliases(string marketplace, string category)
+    {
+        bool isEbay = marketplace.Equals("ebay", StringComparison.OrdinalIgnoreCase);
+
+        var universal    = isEbay ? EbayUniversal    : AmazonUniversal;
+        var catAliasMap  = isEbay ? EbayCategoryAliases : AmazonCategoryAliases;
+
+        var result = new Dictionary<string, string>(universal, StringComparer.OrdinalIgnoreCase);
+
+        if (catAliasMap.TryGetValue(category.ToLowerInvariant(), out var catAliases))
         {
             foreach (var kvp in catAliases)
-                result[kvp.Key] = kvp.Value; // category overrides universal if conflict
+                result[kvp.Key] = kvp.Value;
         }
 
         return result;
     }
+
+    /// <summary>
+    /// Backward-compatible overload — assumes amazon marketplace.
+    /// </summary>
+    public static Dictionary<string, string> GetAliases(string category)
+        => GetAliases("amazon", category);
 
     /// <summary>
     /// Quipt attribute codes that legitimately map to multiple Amazon fields.

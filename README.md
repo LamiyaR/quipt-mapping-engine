@@ -4,18 +4,18 @@
 
 Quipt Mapping Engine is a .NET 10 Web API that **automatically generates XSLT transformations** between Quipt product XML and external marketplace schemas. The goal is to replace the manual process of writing XSLT mappings for each marketplace/category combination with an inference-based approach.
 
-Currently supports **Amazon** across 3 product categories. **eBay** is not started yet.
+Currently supports **Amazon** and **eBay** across 3 product categories each (laptops, desktops, smartphones).
 
 ### How It Works (End-to-End)
 
 ```
-POST /generate  { "category": "laptops" }
+POST /generate  { "category": "laptops", "marketplace": "amazon" }
         │
         ▼
-┌─────────────────┐     ┌──────────────────┐
-│ QuiptSchemaParser│     │ AmazonFieldParser │
-│ (Quipt XML)     │     │ (Amazon JSON)     │
-└────────┬────────┘     └────────┬──────────┘
+┌─────────────────┐     ┌──────────────────────┐
+│ QuiptSchemaParser│     │ AmazonFieldParser     │
+│ (Quipt XML)     │     │ or EbayFieldParser    │
+└────────┬────────┘     └────────┬──────────────┘
          │  List<Field>          │  List<Field>
          └──────────┬────────────┘
                     ▼
@@ -45,19 +45,22 @@ POST /generate  { "category": "laptops" }
 ### What's Working
 
 - **Amazon field parsing** — reads JSON taxonomy files in `AmazonTaxonomy/` and extracts fields with name, type, required flag, and enum values
+- **eBay field parsing** — reads JSON taxonomy files in `eBayTaxonomy/` with eBay's `aspects[]` format (localizedAspectName, aspectConstraint, aspectValues)
 - **Quipt XML parsing** — two-pass parser that extracts both structured `<Attribute>` fields (by Code) and regular leaf elements from XML in `QuiptData/`
 - **Matching engine** — multi-signal heuristic scorer with token overlap, Levenshtein, substring matching, enum overlap, unit similarity, and specificity penalties
-- **1:1 matching** — each Quipt field can only be matched to one Amazon field (prevents duplicates)
+- **Marketplace-aware alias table** — separate Amazon and eBay alias sets; eBay supports both code-based and path-based aliases (e.g. `Brand → q:Catalog/q:Brand/q:Name`)
+- **1:1 matching** — each Quipt field can only be matched to one marketplace field (prevents duplicates)
 - **XSLT generation** — produces a basic but valid XSLT from the matched pairs
-- **Ground truth evaluation** — extracts expected mappings from the manually-written XSLT files in `QuiptToAmazonTemplates/` and compares against auto-generated matches
+- **Ground truth evaluation** — extracts expected mappings from manually-written XSLT/XML files in `QuiptToAmazonTemplates/` and `QuiptToEbayTemplates/` and compares against auto-generated matches
 - **Per-field verdict system** — each field gets a verdict: `CORRECT`, `WRONG`, `MISSING`, `UNMATCHED`, or `NO_GROUND_TRUTH`
 - **Normalization dictionary** — 200+ synonym entries mapping Quipt attribute codes and domain terms to canonical forms
 - **Compound code splitter** — breaks ALL-CAPS Quipt codes (e.g. `GPUMODEL`, `RELEASEYEAR`) into matchable tokens using 35+ known prefixes
-- **Category-aware alias table** — direct Amazon→Quipt overrides for field pairs that heuristic scoring cannot bridge (e.g. `model_year` → `RELEASEYEAR`, `graphics_description` → `GPUMODEL`)
 - **Multi-map whitelist** — fields like `MODELNBR` can legitimately match both `model_name` and `model_number` without being consumed by the first match
-- **Coverage metric** — `coveragePercent` tracks what fraction of all Amazon fields received any match, separate from accuracy
+- **Coverage metric** — `coveragePercent` tracks what fraction of all marketplace fields received any match, separate from accuracy
 
-### Latest Test Results (Amazon)
+### Latest Test Results
+
+#### Amazon
 
 | Category    | Accuracy        | Coverage | Required Coverage | Correct / GT Fields |
 |-------------|-----------------|----------|-------------------|---------------------|
@@ -65,16 +68,23 @@ POST /generate  { "category": "laptops" }
 | Desktops    | **100%**        | 37.72%   | 57.14%            | 8 / 8               |
 | Smartphones | **42.86%**      | 29.48%   | 57.14%            | 3 / 7               |
 
-**Accuracy** is now computed only over ground truth entries that align with actual Amazon field names (the matchable subset). This gives a meaningful percentage rather than dividing by all 167–204 Amazon fields.
+#### eBay
 
-**Coverage** measures what fraction of all Amazon fields received any match — a separate signal from accuracy.
+| Category    | Accuracy        | Coverage | Correct / GT Fields |
+|-------------|-----------------|----------|---------------------|
+| Laptops     | **81.82%**      | 90%      | 18 / 22             |
+| Desktops    | **90%**         | 90.32%   | 18 / 20             |
+| Smartphones | **5.88%**       | 64.52%   | 1 / 17              |
 
-**Smartphones note:** `Smartphones.xml` currently contains desktop-like Quipt codes (`HDSPEED`, `TOTALPCIX8`, `DESKTOPFORMFACT`, etc.) instead of real smartphone attributes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`). The 42.86% accuracy reflects only the fields where the data overlaps (e.g. `MODELNBR`, `RAMSIZE`). This is a **data gap**, not a code limitation — replacing the XML with real smartphone data would immediately raise accuracy.
+**Accuracy** is computed over ground truth entries that align with actual marketplace field names (the matchable subset).
+
+**Coverage** measures what fraction of all marketplace fields received any match — a separate signal from accuracy.
+
+**Smartphones note (both marketplaces):** `Smartphones.xml` currently contains desktop-like Quipt codes (`HDSPEED`, `TOTALPCIX8`, `DESKTOPFORMFACT`, etc.) instead of real smartphone attributes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`). Low accuracy reflects a **data gap**, not a code limitation — replacing the XML with real smartphone data would immediately raise accuracy.
 
 ### What's NOT Done Yet
 
-- **eBay marketplace** — no parser, no taxonomy files, no templates. Fully missing.
-- **Smartphones.xml data gap** — file contains desktop product codes; needs to be replaced with actual smartphone attribute codes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`, `TABOS`, etc.) for meaningful smartphone accuracy
+- **Smartphones.xml data gap** — file contains desktop product codes; needs to be replaced with actual smartphone attribute codes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`, `TABOS`, etc.) for meaningful smartphone accuracy on both Amazon and eBay
 - **XSLT output is basic** — generates a flat structure; doesn't handle nested JSON arrays, conditional logic, or the complex structure seen in the manual XSLT templates
 - **No unit tests** — `Tests/` folder exists with `MatchingTest.csproj` but tests are stub files, not wired up
 - **No CI/CD pipeline**
@@ -87,25 +97,27 @@ POST /generate  { "category": "laptops" }
 quipt-mapping-engine/
 │
 ├── Api/
-│   └── GenerateController.cs          # POST /generate endpoint — orchestrates full pipeline
+│   └── GenerateController.cs          # POST /generate endpoint — orchestrates full pipeline, routes by marketplace
 │
 ├── Services/
 │   ├── AmazonFieldParser.cs           # Parses Amazon JSON taxonomy → List<Field>
+│   ├── EbayFieldParser.cs             # Parses eBay JSON taxonomy (aspects[] format) → List<Field>
 │   └── QuiptSchemaParser.cs           # Parses Quipt XML → List<Field> (two-pass: Attributes + leaves)
 │
 ├── MatchingEngine/
-│   ├── MatchingEngine.cs              # Core scoring engine (7 signals + specificity, category-aware aliases)
+│   ├── MatchingEngine.cs              # Core scoring engine (7 signals + specificity, marketplace-aware aliases)
 │   └── Similarity.cs                  # Levenshtein distance implementation
 │
 ├── Normalization/
 │   ├── FieldNormalizer.cs             # Tokenizes + normalizes field names (camelCase, compound code splitter, synonym lookup)
 │   ├── NormalizationDictionary.cs     # 200+ synonym entries (Quipt codes → canonical terms)
-│   ├── FieldAliasTable.cs             # Category-aware direct Amazon→Quipt overrides + multi-map whitelist
+│   ├── FieldAliasTable.cs             # Marketplace-aware Amazon+eBay aliases, path aliases, multi-map whitelist
 │   └── EnumOverlapScorer.cs           # Jaccard overlap between enum value lists
 │
 ├── Evaluation/
 │   ├── EvaluationService.cs           # Computes accuracy % and required field coverage %
 │   ├── GroundTruthXsltExtractor.cs    # Extracts amazon→quipt mappings from manual XSLT files
+│   ├── EbayGroundTruthExtractor.cs    # Extracts ebay→quipt mappings from eBay XML config files
 │   ├── EvaluatedMapping.cs            # Data model for evaluation input
 │   ├── EvaluationReport.cs            # Data model for evaluation output
 │   └── PurvikaAdapter.cs              # Adapter to convert matching results for evaluation
@@ -115,7 +127,7 @@ quipt-mapping-engine/
 │
 ├── Models/
 │   ├── Field.cs                       # Schema field (Name, Path, DataType, IsRequired, EnumValues)
-│   ├── MappingResult.cs               # Match result (AmazonField, QuiptPath, Score, IsRequired, IsUnmatched)
+│   ├── MappingResult.cs               # Match result (MarketplaceField, QuiptPath, Score, IsRequired, IsUnmatched)
 │   ├── ApiResponseModel.cs            # Full API response with mappings + evaluation details
 │   └── SchemaModel.cs                 # (empty — unused)
 │
@@ -124,19 +136,26 @@ quipt-mapping-engine/
 │   ├── amazon-laptops-attributes.json
 │   └── amazon-smartphones-attributes.json
 │
+├── eBayTaxonomy/                      # eBay JSON schema files per category
+│   ├── ebay-desktop-attributes.json
+│   ├── ebay-laptops-attributes.json
+│   └── ebay-smartphones-attributes.json
+│
 ├── QuiptData/                         # Sample Quipt XML exports per category
 │   ├── Desktops.xml
 │   ├── Laptops.xml
 │   └── Smartphones.xml
 │
-├── QuiptToAmazonTemplates/            # Manually-written XSLT (ground truth for evaluation)
+├── QuiptToAmazonTemplates/            # Manually-written XSLT (Amazon ground truth for evaluation)
 │   ├── CatalogExportTransform.Laptops.xslt
 │   ├── CatalogExportTransform.Desktops.xslt
 │   ├── CatalogExportTransform.SmartPhones.xslt
-│   ├── CatalogExportTransform.Builder.MasterTemplate.json.xslt
-│   ├── CatalogExportTransform.Builder.xslt
-│   ├── inventory.shared.xslt
 │   └── ... (shared + utility templates)
+│
+├── QuiptToEbayTemplates/              # Manually-written XML config (eBay ground truth for evaluation)
+│   ├── CatalogExportTransform.Laptops.xml
+│   ├── CatalogExportTransform.Desktops.xml
+│   └── CatalogExportTransform.SmartPhones.xml
 │
 ├── Member4TestHarness/
 │   └── Member4QuickTest.cs            # Quick test harness (not part of main pipeline)
@@ -221,17 +240,25 @@ Fields in the **multi-map whitelist** (e.g. `MODELNBR`, `RAMSIZE`, `USBPRT`, `US
 
 The dictionary covers 200+ mappings including all Quipt attribute codes and domain synonyms for ports, peripherals, display, camera, battery, storage, connectivity, year/date, form factors, expansion slots, and more.
 
-### 5. Category-Aware Alias Table
+### 5. Marketplace-Aware Alias Table
 
-`FieldAliasTable` provides direct Amazon→Quipt Code overrides for field pairs that heuristic scoring cannot bridge due to irreconcilably different naming conventions. It is checked before scoring and short-circuits the matching loop with a perfect score.
+`FieldAliasTable` provides direct marketplace→Quipt overrides for field pairs that heuristic scoring cannot bridge due to irreconcilably different naming conventions. It is checked before scoring and short-circuits the matching loop with a perfect score.
 
-**Universal aliases** (all categories): `connectivity_technology` → `HDTYPE`, `model_year` → `RELEASEYEAR`
+The table supports both **Amazon** and **eBay** aliases, each with universal (all-category) and category-specific entries.
 
-**Laptop aliases** (examples): `graphics_description` → `GPUMODEL`, `memory_storage_capacity` → `RAMSIZE`, `size` → `SCRNSIZE`, `processor_count` → `CPUCORE`, `total_usb_2_0_ports` → `USBPRT`, `total_usb_3_0_ports` → `USBPWR`
+**eBay path aliases** — for structural Quipt fields with no Code attribute (e.g. `Brand → q:Catalog/q:Brand/q:Name`). Matched using EndsWith to handle full-qualified vs. relative path differences.
 
-**Desktop aliases** (examples): `graphics_description` → `GPUTYPE`, `memory_storage_capacity` → `HDSIZE`, `specific_uses_for_product` → `PCLIFESTYLE`
+**Amazon universal aliases** (all categories): `connectivity_technology` → `HDTYPE`, `model_year` → `RELEASEYEAR`
 
-**Smartphone aliases** (examples): `telephone_type` → `DUALSIM`, `effective_still_resolution` → `REARCAM`, `digital_storage_capacity` → `STORSIZE`
+**Amazon laptop aliases** (examples): `graphics_description` → `GPUMODEL`, `memory_storage_capacity` → `RAMSIZE`, `size` → `SCRNSIZE`, `processor_count` → `CPUCORE`
+
+**Amazon desktop aliases** (examples): `graphics_description` → `GPUTYPE`, `memory_storage_capacity` → `HDSIZE`, `specific_uses_for_product` → `PCLIFESTYLE`
+
+**eBay universal aliases**: `Release Year` → `RELEASEYEAR`, `Model` → `MODELNBR`, `Color` → `GENERICCOLOR`, `RAM Size` → `RAMSIZE`, `Storage Type` → `HDTYPEHWARE`
+
+**eBay laptop aliases** (examples): `Type` → `NOTEBOOKFORMFACT`, `GPU` → `GPUMODEL`, `Screen Size` → `SCRNSIZE`, `SSD Capacity` → `HDTYPEHWARE`, `Graphics Processing Type` → `GPUTYPE`
+
+**eBay desktop aliases** (examples): `Form Factor` → `DESKTOPFORMFACT`, `Maximum RAM Capacity` → `RAMMAX`, `Series` → `DESKTOPPRODLINE`, `Connectivity` → `TOTALDVI`
 
 ---
 
@@ -244,18 +271,24 @@ POST http://localhost:5253/generate
 Content-Type: application/json
 
 {
-  "category": "laptops"
+  "category": "laptops",
+  "marketplace": "amazon"
 }
 ```
 
 Valid categories: `laptops`, `desktops`, `smartphones`
+
+Valid marketplaces: `amazon` (default), `ebay`
+
+The `marketplace` field is optional and defaults to `"amazon"` for backward compatibility.
 
 ### Response Shape
 
 ```json
 {
   "category": "laptops",
-  "amazonFieldCount": 204,
+  "marketplace": "amazon",
+  "marketplaceFieldCount": 204,
   "quiptFieldCount": 210,
   "mappingCount": 84,
   "accuracy": 100.0,
@@ -267,7 +300,7 @@ Valid categories: `laptops`, `desktops`, `smartphones`
   "generatedXslt": "<xsl:stylesheet ...>...</xsl:stylesheet>",
   "mappings": [
     {
-      "amazonField": "brand",
+      "marketplaceField": "brand",
       "quiptPath": "q:Catalog/q:Brand/q:Name",
       "score": 0.6532,
       "isRequired": true,
@@ -276,7 +309,7 @@ Valid categories: `laptops`, `desktops`, `smartphones`
   ],
   "evaluationDetails": [
     {
-      "amazonField": "brand",
+      "marketplaceField": "brand",
       "isRequired": true,
       "autoMatchedPath": "q:Catalog/q:Brand/q:Name",
       "score": 0.6532,
@@ -284,7 +317,7 @@ Valid categories: `laptops`, `desktops`, `smartphones`
       "verdict": "CORRECT"
     },
     {
-      "amazonField": "model_number",
+      "marketplaceField": "model_number",
       "isRequired": false,
       "autoMatchedPath": "q:Catalog/q:PhoneNumber",
       "score": 0.45,
@@ -332,15 +365,9 @@ curl -X POST http://localhost:5253/generate -H "Content-Type: application/json" 
 
 ### Accuracy Improvements Needed
 1. **Smartphones.xml data gap** — the file contains desktop-style codes instead of real smartphone attributes. Replacing it with actual smartphone product data would immediately unlock BATCAP, STORSIZE, DUALSIM, REARCAM, TABOS, and other smartphone-specific aliases that are already defined in `FieldAliasTable`.
-2. **Smarter matching signals** — current approach is pure heuristic. Could explore: TF-IDF weighting, embedding-based similarity, or learning weights from correct matches.
-3. **Ground truth coverage** — only 11–8 Amazon fields per category have verified ground truth entries. Expanding the manual XSLT templates to cover more Amazon fields would reveal new accuracy gaps.
-
-### eBay Marketplace (Not Started)
-- No eBay taxonomy files exist
-- No eBay parser
-- No eBay ground truth XSLT templates
-- Need to determine eBay's field format (JSON? XML? API?)
-- `GenerateController` is currently Amazon-only — needs marketplace parameter and routing
+2. **eBay composite fields** — fields like `Connectivity` and `Features` map to multiple Quipt codes in the ground truth (e.g. USB ports + video outputs). The current engine picks the first match; future work could express multi-code rules.
+3. **eBay MPN field** — maps to `q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value` which is a complex path requiring a special alias mechanism not yet implemented.
+4. **Smarter matching signals** — current approach is pure heuristic. Could explore: TF-IDF weighting, embedding-based similarity, or learning weights from correct matches.
 
 ### XSLT Generation
 - Current output is a flat `<xsl:value-of>` per field

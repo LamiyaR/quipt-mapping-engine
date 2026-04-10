@@ -53,15 +53,15 @@ public static class Member4QuickTest
         // Auto results (pretend this is what Purvika produced)
         var autoMappings = new List<EvaluatedMapping>
         {
-            new() { AmazonFieldName = "brand", IsRequired = true, MatchedQuiptXPath = "q:Catalog/q:Brand/q:Name" }, // correct
-            new() { AmazonFieldName = "itemWeight", IsRequired = true, MatchedQuiptXPath = null },                 // required but unmatched
-            new() { AmazonFieldName = "color", IsRequired = false, MatchedQuiptXPath = "q:Catalog/q:Colour" }      // wrong
+            new() { MarketplaceFieldName = "brand", IsRequired = true, MatchedQuiptXPath = "q:Catalog/q:Brand/q:Name" }, // correct
+            new() { MarketplaceFieldName = "itemWeight", IsRequired = true, MatchedQuiptXPath = null },                 // required but unmatched
+            new() { MarketplaceFieldName = "color", IsRequired = false, MatchedQuiptXPath = "q:Catalog/q:Colour" }      // wrong
         };
 
         var report = EvaluationService.Evaluate("Laptops", autoMappings, groundTruth);
 
         Console.WriteLine($"Category: {report.Category}");
-        Console.WriteLine($"Accuracy: {report.AccuracyPercent:F2}% ({report.CorrectMatches}/{report.TotalAmazonFields})");
+        Console.WriteLine($"Accuracy: {report.AccuracyPercent:F2}% ({report.CorrectMatches}/{report.TotalMarketplaceFields})");
         Console.WriteLine($"Required Coverage: {report.RequiredCoveragePercent:F2}% ({report.MatchedRequiredFields}/{report.TotalRequiredFields})");
         Console.WriteLine("Unmatched Required Fields: " + string.Join(", ", report.UnmatchedRequiredFields));
     }

@@ -1,0 +1,472 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CatalogTemplateRequest.BuilderDetails xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.quipt.com/api">
+  <Attributes>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Brand</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Brand/q:Name" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Model</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name='qProdLn' select="q:Catalog/q:Attributes/q:Attribute[q:Code='PHONEPRODLINE']/q:Value/a:string[1]" /&gt;
+
+
+&lt;xsl:choose&gt;
+
+&lt;xsl:when test="contains($qProdLn,'Not Applicable') "&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='MODELNBR']/q:Value/a:string[1]" /&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:otherwise&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='PHONEPRODLINE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:text&gt;&amp;#160;&lt;/xsl:text&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='MODELNBR']/q:Value/a:string[1]" /&gt;
+&lt;/xsl:otherwise&gt;
+
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Network</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name='qcellstatus' select="q:Catalog/q:Attributes/q:Attribute[q:Code='LOCKEDUNLOCKED']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt;
+
+&lt;xsl:when test="$qcellstatus != 'Unlocked' "&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='NETWORKPROVIDER']/q:Value/a:string[1]" /&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:otherwise&gt;
+&lt;xsl:text&gt;Unlocked&lt;/xsl:text&gt;
+&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Operating System</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name ="qphoneos"
+select="q:Catalog/q:Attributes/q:Attribute[q:Code='TABOS']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt;
+&lt;xsl:when test="contains($qphoneos, 'Android') "&gt;
+&lt;xsl:text&gt;Android&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="contains($qphoneos, 'FireOS') "&gt;
+&lt;xsl:text&gt;Fire OS&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+
+&lt;xsl:when test="contains($qphoneos, 'iOS') "&gt;
+&lt;xsl:text&gt;iOS&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+
+&lt;xsl:otherwise&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='TABOS']/q:Value/a:string[1]" /&gt;
+&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Storage Capacity</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='STORSIZE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:text&gt;GB&lt;/xsl:text&gt;
+</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Color</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name='qColor' select="q:Catalog/q:Attributes/q:Attribute[q:Code='EXACTCOLOR']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt;
+
+&lt;xsl:when test="$qColor='Grey'"&gt;
+   &lt;xsl:text&gt;Gray&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+&lt;xsl:otherwise&gt;
+  &lt;xsl:value-of select="$qColor"/&gt;
+&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Screen Size</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name ="qphonescreensz"
+select="q:Catalog/q:Attributes/q:Attribute[q:Code='SCRNSIZE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt; 
+&lt;xsl:when test="$qphonescreensz &amp;gt; 0"&gt;
+&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='SCRNSIZE']/q:Value/a:string[1]" /&gt;
+&lt;xsl:text&gt;"&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;/xsl:choose&gt;
+</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>RAM</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--FreeText
+2GB
+1GB
+768MB
+592MB--&gt;
+
+&lt;xsl:variable name="ram" select="q:Catalog/q:Attributes/q:Attribute[q:Code='RAMSIZE']/q:Value/a:string[1]" /&gt;
+
+
+&lt;xsl:choose&gt; 
+	&lt;xsl:when test="$ram &amp;lt; 1"&gt;
+		&lt;xsl:value-of select="concat($ram * 1000 , 'MB')" /&gt;
+	&lt;/xsl:when&gt;
+
+	&lt;xsl:when test="$ram &amp;gt;= 1"&gt;
+		&lt;xsl:value-of select="concat(format-number($ram, '#.#'), 'GB')" /&gt;
+	&lt;/xsl:when&gt;
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Lock Status</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name="qcellstatus" select="q:Catalog/q:Attributes/q:Attribute[q:Code='LOCKEDUNLOCKED']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt;
+
+&lt;xsl:when test ="$qcellstatus !='Unlocked' "&gt;
+&lt;xsl:text&gt;Network Locked&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:otherwise&gt;
+&lt;xsl:text&gt;Unlocked&lt;/xsl:text&gt;
+&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Camera Resolution</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name="qCamera" select="q:Catalog/q:Attributes/q:Attribute[q:Code='REARCAM']/q:Value/a:string[1]" /&gt;
+
+
+&lt;xsl:choose&gt; 
+
+	&lt;xsl:when test="$qCamera &amp;gt;= 0"&gt;
+		&lt;xsl:value-of select="concat(format-number($qCamera, '#.#'), ' MP')" /&gt;
+	&lt;/xsl:when&gt;
+
+        &lt;xsl:otherwise&gt;&lt;xsl:text&gt;Not Applicable&lt;/xsl:text&gt;&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Connectivity</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='WIRELESSTECH']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Model Number</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='SPMFG']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Features</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;!--freetext--&gt;
+&lt;xsl:variable name="displayType" select="q:Catalog/q:Attributes/q:Attribute[q:Code='DSPLYTYPE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:variable name="resolution" select="q:Catalog/q:Attributes/q:Attribute[q:Code='NATIVERES']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:variable name="screenSize" select="q:Catalog/q:Attributes/q:Attribute[q:Code='SCRNSIZE']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:variable name="outputFragmentCollection"&gt;
+	&lt;data&gt;
+		 &lt;xsl:value-of select="concat($screenSize, ' inch ', $resolution, ' ', $displayType, ' display')" /&gt;
+	&lt;/data&gt;
+&lt;/xsl:variable&gt;
+
+
+&lt;xsl:for-each select="msxsl:node-set($outputFragmentCollection)/*[. != '']"&gt;
+	&lt;xsl:if test="position() &amp;gt; 1"&gt;&lt;xsl:text&gt;|&lt;/xsl:text&gt;&lt;/xsl:if&gt;
+	&lt;xsl:value-of select="."/&gt;
+&lt;/xsl:for-each&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Contract</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:variable name="qcellstatus" select="q:Catalog/q:Attributes/q:Attribute[q:Code='LOCKEDUNLOCKED']/q:Value/a:string[1]" /&gt;
+
+&lt;xsl:choose&gt;
+
+&lt;xsl:when test ="$qcellstatus='Locked' "&gt;
+&lt;xsl:text&gt;With Contract&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:when test="contains($qcellstatus,'Prepaid') "&gt;
+&lt;xsl:text&gt;Prepaid&lt;/xsl:text&gt;
+&lt;/xsl:when&gt;
+
+&lt;xsl:otherwise&gt;
+&lt;xsl:text&gt;Without Contract&lt;/xsl:text&gt;
+&lt;/xsl:otherwise&gt;
+
+&lt;/xsl:choose&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>MPN</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Item Height</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value> &lt;xsl:if test="normalize-space(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string)!=''"&gt;
+      &lt;xsl:value-of select="normalize-space(substring-before(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string,'x'))"/&gt;
+    &lt;/xsl:if&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Item Length</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:if test="normalize-space(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string)!=''"&gt;
+      &lt;xsl:value-of select="normalize-space(substring-before(substring-after(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string,'x'),'x'))"/&gt;
+    &lt;/xsl:if&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Item Width</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:if test="normalize-space(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string)!=''"&gt;
+      &lt;xsl:value-of select="normalize-space(substring-after(substring-after(q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMDIMS']/q:Value/a:string,'x'),'x'))"/&gt;
+    &lt;/xsl:if&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>SIM Card slot</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='DUALSIM']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Style</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:text&gt;Bar&lt;/xsl:text&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Country/Region of Manufacture</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:CountryOfOrigin/q:Name" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>Name</Key>
+          <Value>Cellular Band</Value>
+        </CatalogTemplateRequest.Property>
+        <CatalogTemplateRequest.Property>
+          <Key>Value</Key>
+          <Value>&lt;xsl:value-of select="q:Catalog/q:Attributes/q:Attribute[q:Code='CELLULARNETWORK']/q:Value/a:string[1]" /&gt;</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+  </Attributes>
+  <Global>
+    <CatalogTemplateRequest.Property>
+      <Key>CategoryId</Key>
+      <Value>9355</Value>
+    </CatalogTemplateRequest.Property>
+    <CatalogTemplateRequest.Property>
+      <Key>Condition</Key>
+      <Value></Value>
+    </CatalogTemplateRequest.Property>
+    <CatalogTemplateRequest.Property>
+      <Key>Filter</Key>
+      <Value></Value>
+    </CatalogTemplateRequest.Property>
+  </Global>
+  <HasVariantManager>false</HasVariantManager>
+  <Variants>
+    <CatalogTemplateRequest.Attribute>
+      <Properties>
+        <CatalogTemplateRequest.Property>
+          <Key>AttributeCodeMappings</Key>
+          <Value>&lt;string quiptCode="EXACTCOLOR"&gt;Color&lt;/string&gt;
+
+</Value>
+        </CatalogTemplateRequest.Property>
+      </Properties>
+      <Type>Default</Type>
+    </CatalogTemplateRequest.Attribute>
+  </Variants>
+</CatalogTemplateRequest.BuilderDetails>

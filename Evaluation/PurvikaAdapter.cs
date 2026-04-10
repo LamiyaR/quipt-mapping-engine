@@ -15,7 +15,7 @@ public static class PurvikaAdapter
 
             list.Add(new EvaluatedMapping
             {
-                AmazonFieldName = amazonName,
+                MarketplaceFieldName = amazonName,
                 IsRequired = isRequired,
                 MatchedQuiptXPath = quiptPath
             });
