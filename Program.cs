@@ -19,11 +19,15 @@ if (args.Contains("--member4test"))
     return; // Stop app after harness runs
 }
 
+// Serve presentation/demo UI from wwwroot/index.html.
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 /*
-    TEMP DEMO ENDPOINT (Amazon parser test)
-    GET http://localhost:5253/
+    DEBUG ENDPOINT (Amazon parser test)
+    GET http://localhost:5253/debug/amazon-fields
 */
-app.MapGet("/", () =>
+app.MapGet("/debug/amazon-fields", () =>
 {
     var parser = new AmazonFieldParser();
     var filePath = "AmazonTaxonomy/amazon-laptops-attributes.json";
@@ -54,7 +58,7 @@ app.MapGet("/", () =>
     }
 });
 
-// Enable your /generate controller route
+// Enable /generate controller route.
 app.MapControllers();
 
 app.MapGet("/ping", () => "pong");

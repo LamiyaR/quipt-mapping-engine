@@ -57,6 +57,7 @@ POST /generate  { "category": "laptops", "marketplace": "amazon" }
 - **Compound code splitter** — breaks ALL-CAPS Quipt codes (e.g. `GPUMODEL`, `RELEASEYEAR`) into matchable tokens using 35+ known prefixes
 - **Multi-map whitelist** — fields like `MODELNBR` can legitimately match both `model_name` and `model_number` without being consumed by the first match
 - **Coverage metric** — `coveragePercent` tracks what fraction of all marketplace fields received any match, separate from accuracy
+- **Browser-based workflow demo UI** — served at `/` from `wwwroot/index.html`; provides live `/generate` execution, step-by-step pipeline visualization, KPI cards, per-field verdict table, and generated XSLT preview for non-technical stakeholders
 
 ### Latest Test Results
 
@@ -156,6 +157,9 @@ quipt-mapping-engine/
 │   ├── CatalogExportTransform.Laptops.xml
 │   ├── CatalogExportTransform.Desktops.xml
 │   └── CatalogExportTransform.SmartPhones.xml
+│
+├── wwwroot/
+│   └── index.html                     # Presentation/demo UI served at GET /
 │
 ├── Member4TestHarness/
 │   └── Member4QuickTest.cs            # Quick test harness (not part of main pipeline)
@@ -340,6 +344,42 @@ The `marketplace` field is optional and defaults to `"amazon"` for backward comp
 
 ---
 
+## Web Workflow Demo UI
+
+A browser-based demo is served alongside the API for use in presentations and stakeholder reviews.
+
+### Routes
+
+| Method | Route                    | Description                              |
+|--------|--------------------------|------------------------------------------|
+| `GET`  | `/`                      | Demo UI (`wwwroot/index.html`)           |
+| `GET`  | `/debug/amazon-fields`   | Parser debug output (raw field list)     |
+| `POST` | `/generate`              | Core API endpoint (JSON response)        |
+
+### What the UI Shows
+
+- **5-step pipeline visualization:** Ingest Specs → Normalize Terms → Infer Mappings → Evaluate Quality → Generate XSLT
+- **KPI cards:**
+  - Accuracy (vs Ground Truth)
+  - All Fields Coverage
+  - Required Fields Coverage
+  - Correct / Ground Truth
+  - Generated Mappings
+- **Field verdict table** — top results with `CORRECT` / `WRONG` / `MISSING` / `UNMATCHED` / `NO_GROUND_TRUTH` status
+- **Generated XSLT preview panel** — scrollable output of the auto-generated transformation
+
+### Presentation Flow
+
+1. Select category (laptops / desktops / smartphones) and marketplace (Amazon / eBay)
+2. Click **Run Live Demo** — executes a live `POST /generate` call
+3. Review KPI cards and the field verdict table
+4. Inspect the generated XSLT preview panel
+5. Demonstrates end-to-end automation visually — no manual XSLT authoring required
+
+> **Note:** The primary system output is the generated XSLT. Mappings and accuracy metrics are supporting outputs for validation and explainability.
+
+---
+
 ## Development Setup
 
 **Requirements:**
@@ -353,6 +393,9 @@ dotnet restore
 dotnet run
 # API starts on http://localhost:5253
 ```
+
+After starting, open `http://localhost:5253/` to launch the demo UI.  
+Use `POST /generate` for API testing and `GET /debug/amazon-fields` for parser debug output.
 
 **Test via Postman or curl:**
 ```bash
