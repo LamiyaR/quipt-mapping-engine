@@ -66,6 +66,144 @@
 			<AltTitle2/>
 			<Attributes>
 				<Attribute>
+					<Code>STORSIZE</Code>
+					<Name>Storage Capacity (GB)</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>128</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>REARCAM</Code>
+					<Name>Camera Resolution (MP)</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>50</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>TABOS</Code>
+					<Name>Operating System</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Android 14</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>DUALSIM</Code>
+					<Name>SIM Card Slot</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Dual SIM</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>BATCAP</Code>
+					<Name>Battery Capacity (mAh)</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>5000</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>BATSIZE</Code>
+					<Name>Battery Size (mAh)</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>5000</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>BATTYPE</Code>
+					<Name>Battery Type</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Lithium Ion</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>BATWEIGHT</Code>
+					<Name>Battery Weight (g)</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>60</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>CELLULARNETWORK</Code>
+					<Name>Cellular Network</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>5G</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>NETWORKPROVIDER</Code>
+					<Name>Wireless Provider</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Unlocked</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>PHONEPRODLINE</Code>
+					<Name>Phone Product Line</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Galaxy S</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>SCRNSIZE</Code>
+					<Name>Screen Size</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>6.5</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>NATIVERES</Code>
+					<Name>Native Resolution</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>2400 x 1080</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>WIRELESSTECH</Code>
+					<Name>Wireless Technology</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>5G</a:string>
+						<a:string>Wi-Fi</a:string>
+						<a:string>Bluetooth</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>DSPLYTYPE</Code>
+					<Name>Display Type</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>AMOLED</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>LOCKEDUNLOCKED</Code>
+					<Name>Lock Status</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Unlocked</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>SPMFG</Code>
+					<Name>Model Number</Name>
+					<Section i:nil="true"/>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>SM-S928U</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
 					<Code>HDSPEED</Code>
 					<Id>2638d3c6-cf49-4f7f-9ef9-0239112f9784</Id>
 					<IsOption>false</IsOption>

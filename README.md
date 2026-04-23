@@ -57,6 +57,7 @@ POST /generate  { "category": "laptops", "marketplace": "amazon" }
 - **Compound code splitter** — breaks ALL-CAPS Quipt codes (e.g. `GPUMODEL`, `RELEASEYEAR`) into matchable tokens using 35+ known prefixes
 - **Multi-map whitelist** — fields like `MODELNBR` can legitimately match both `model_name` and `model_number` without being consumed by the first match
 - **Coverage metric** — `coveragePercent` tracks what fraction of all marketplace fields received any match, separate from accuracy
+- **Browser-based workflow demo UI** — served at `/` from `wwwroot/index.html`; provides live `/generate` execution, step-by-step pipeline visualization, KPI cards, per-field verdict table, and generated XSLT preview for non-technical stakeholders
 
 ### Latest Test Results
 
@@ -66,28 +67,28 @@ POST /generate  { "category": "laptops", "marketplace": "amazon" }
 |-------------|-----------------|----------|-------------------|---------------------|
 | Laptops     | **100%**        | 41.18%   | 57.14%            | 11 / 11             |
 | Desktops    | **100%**        | 37.72%   | 57.14%            | 8 / 8               |
-| Smartphones | **42.86%**      | 29.48%   | 57.14%            | 3 / 7               |
+| Smartphones | **85.71%**      | 33.53%   | 57.14%            | 6 / 7               |
 
 #### eBay
 
 | Category    | Accuracy        | Coverage | Correct / GT Fields |
 |-------------|-----------------|----------|---------------------|
-| Laptops     | **81.82%**      | 90%      | 18 / 22             |
-| Desktops    | **90%**         | 90.32%   | 18 / 20             |
-| Smartphones | **5.88%**       | 64.52%   | 1 / 17              |
+| Laptops     | **86.36%**      | 90%      | 19 / 22             |
+| Desktops    | **95%**         | 93.55%   | 19 / 20             |
+| Smartphones | **100%**        | 80.65%   | 17 / 17             |
 
 **Accuracy** is computed over ground truth entries that align with actual marketplace field names (the matchable subset).
 
 **Coverage** measures what fraction of all marketplace fields received any match — a separate signal from accuracy.
 
-**Smartphones note (both marketplaces):** `Smartphones.xml` currently contains desktop-like Quipt codes (`HDSPEED`, `TOTALPCIX8`, `DESKTOPFORMFACT`, etc.) instead of real smartphone attributes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`). Low accuracy reflects a **data gap**, not a code limitation — replacing the XML with real smartphone data would immediately raise accuracy.
+Smartphone-specific codes expected by the manual templates were added to `QuiptData/Smartphones.xml`, which removed the largest data gap and significantly improved smartphone accuracy on both marketplaces.
 
 ### What's NOT Done Yet
 
-- **Smartphones.xml data gap** — file contains desktop product codes; needs to be replaced with actual smartphone attribute codes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`, `TABOS`, etc.) for meaningful smartphone accuracy on both Amazon and eBay
 - **XSLT output is basic** — generates a flat structure; doesn't handle nested JSON arrays, conditional logic, or the complex structure seen in the manual XSLT templates
 - **No unit tests** — `Tests/` folder exists with `MatchingTest.csproj` but tests are stub files, not wired up
 - **No CI/CD pipeline**
+- **Remaining gaps are XSLT sophistication, unit tests, and CI** — smartphone data availability is no longer the bottleneck
 
 ---
 
@@ -156,6 +157,9 @@ quipt-mapping-engine/
 │   ├── CatalogExportTransform.Laptops.xml
 │   ├── CatalogExportTransform.Desktops.xml
 │   └── CatalogExportTransform.SmartPhones.xml
+│
+├── wwwroot/
+│   └── index.html                     # Presentation/demo UI served at GET /
 │
 ├── Member4TestHarness/
 │   └── Member4QuickTest.cs            # Quick test harness (not part of main pipeline)
@@ -340,6 +344,42 @@ The `marketplace` field is optional and defaults to `"amazon"` for backward comp
 
 ---
 
+## Web Workflow Demo UI
+
+A browser-based demo is served alongside the API for use in presentations and stakeholder reviews.
+
+### Routes
+
+| Method | Route                    | Description                              |
+|--------|--------------------------|------------------------------------------|
+| `GET`  | `/`                      | Demo UI (`wwwroot/index.html`)           |
+| `GET`  | `/debug/amazon-fields`   | Parser debug output (raw field list)     |
+| `POST` | `/generate`              | Core API endpoint (JSON response)        |
+
+### What the UI Shows
+
+- **5-step pipeline visualization:** Ingest Specs → Normalize Terms → Infer Mappings → Evaluate Quality → Generate XSLT
+- **KPI cards:**
+  - Accuracy (vs Ground Truth)
+  - All Fields Coverage
+  - Required Fields Coverage
+  - Correct / Ground Truth
+  - Generated Mappings
+- **Field verdict table** — top results with `CORRECT` / `WRONG` / `MISSING` / `UNMATCHED` / `NO_GROUND_TRUTH` status
+- **Generated XSLT preview panel** — scrollable output of the auto-generated transformation
+
+### Presentation Flow
+
+1. Select category (laptops / desktops / smartphones) and marketplace (Amazon / eBay)
+2. Click **Run Live Demo** — executes a live `POST /generate` call
+3. Review KPI cards and the field verdict table
+4. Inspect the generated XSLT preview panel
+5. Demonstrates end-to-end automation visually — no manual XSLT authoring required
+
+> **Note:** The primary system output is the generated XSLT. Mappings and accuracy metrics are supporting outputs for validation and explainability.
+
+---
+
 ## Development Setup
 
 **Requirements:**
@@ -354,6 +394,9 @@ dotnet run
 # API starts on http://localhost:5253
 ```
 
+After starting, open `http://localhost:5253/` to launch the demo UI.  
+Use `POST /generate` for API testing and `GET /debug/amazon-fields` for parser debug output.
+
 **Test via Postman or curl:**
 ```bash
 curl -X POST http://localhost:5253/generate -H "Content-Type: application/json" -d "{\"category\": \"laptops\"}"
@@ -364,10 +407,10 @@ curl -X POST http://localhost:5253/generate -H "Content-Type: application/json" 
 ## Known Issues & Next Steps
 
 ### Accuracy Improvements Needed
-1. **Smartphones.xml data gap** — the file contains desktop-style codes instead of real smartphone attributes. Replacing it with actual smartphone product data would immediately unlock BATCAP, STORSIZE, DUALSIM, REARCAM, TABOS, and other smartphone-specific aliases that are already defined in `FieldAliasTable`.
-2. **eBay composite fields** — fields like `Connectivity` and `Features` map to multiple Quipt codes in the ground truth (e.g. USB ports + video outputs). The current engine picks the first match; future work could express multi-code rules.
-3. **eBay MPN field** — maps to `q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value` which is a complex path requiring a special alias mechanism not yet implemented.
-4. **Smarter matching signals** — current approach is pure heuristic. Could explore: TF-IDF weighting, embedding-based similarity, or learning weights from correct matches.
+1. **eBay composite field handling** — single-best-field matching cannot resolve fields that map to multi-code expressions in ground truth (e.g. `Connectivity`, `Features`).
+2. **Value-format parity with manual templates** — some fields expect transformed values (unit appending, concatenation, conditional output) that plain path matching cannot produce.
+3. **Smarter ranking signals** (future enhancement) — current heuristics could be improved with TF-IDF, embedding similarity, or learned weights from accepted mappings.
+4. **Regression tests for cross-category alias behavior** — alias table changes can silently break other categories; automated checks are needed.
 
 ### XSLT Generation
 - Current output is a flat `<xsl:value-of>` per field

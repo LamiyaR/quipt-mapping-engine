@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quipt Mapping Engine Workflow Demo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+    :root {
+      --bg: #f4f8fb;
+      --panel: #ffffff;
+      --ink: #17212b;
+      --subtle: #566677;
+      --line: #d5e0ea;
+      --brand: #0d5c9e;
+      --brand-soft: #d8ebfb;
+      --good: #198754;
+      --warn: #c27a00;
+      --bad: #b43a31;
+      --accent: #ff8a3d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 5%, #ffffff 0%, #edf5fc 40%, var(--bg) 100%);
+    }
+
+    .wrap {
+      width: min(1200px, 94vw);
+      margin: 28px auto 48px;
+    }
+
+    .hero {
+      background: linear-gradient(130deg, #ffffff 0%, #eef7ff 60%, #fff6ef 100%);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 28px rgba(16, 40, 64, 0.08);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: 0.2px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--subtle);
+      font-size: 1.02rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .controls {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--subtle);
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .field select, .field button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 11px 12px;
+      font-size: 0.98rem;
+      font-family: inherit;
+    }
+
+    .field select {
+      background: #fff;
+    }
+
+    .field button {
+      border: 0;
+      background: linear-gradient(135deg, var(--brand), #2576b6);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+      box-shadow: 0 8px 14px rgba(13, 92, 158, 0.28);
+    }
+
+    .field button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 16px rgba(13, 92, 158, 0.32);
+    }
+
+    .status {
+      margin-top: 12px;
+      color: var(--subtle);
+      font-size: 0.95rem;
+      min-height: 20px;
+    }
+
+    .flow {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .flow-step {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      padding: 12px;
+      min-height: 102px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 4px;
+      background: transparent;
+      transition: background .2s ease;
+    }
+
+    .flow-step h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .flow-step p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--subtle);
+      line-height: 1.35;
+    }
+
+    .flow-step.active {
+      transform: translateY(-2px);
+      border-color: var(--brand);
+      background: #f2f8ff;
+    }
+
+    .flow-step.active::after { background: var(--brand); }
+    .flow-step.done::after { background: var(--good); }
+
+    .kpis {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .kpi {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: var(--panel);
+    }
+
+    .kpi .label {
+      color: var(--subtle);
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    .kpi .value {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 1.55rem;
+      letter-spacing: 0.2px;
+    }
+
+    .kpi .hint {
+      margin-top: 6px;
+      color: #6b7f93;
+      font-size: 0.78rem;
+      letter-spacing: 0.1px;
+      min-height: 16px;
+    }
+
+    .results {
+      grid-template-columns: 1.2fr .8fr;
+      margin-top: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid #e5edf4;
+      padding: 8px 6px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--subtle);
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.15px;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .v-correct { background: #dcf6e9; color: #0f6a3f; }
+    .v-wrong { background: #fde2df; color: #8c251f; }
+    .v-missing { background: #ffeecf; color: #865400; }
+    .v-other { background: #e8eef6; color: #2f465f; }
+
+    pre {
+      margin: 0;
+      max-height: 430px;
+      overflow: auto;
+      background: #0f1b28;
+      color: #d4e5f7;
+      border-radius: 10px;
+      border: 1px solid #223448;
+      padding: 12px;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (max-width: 980px) {
+      .controls, .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .results { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .controls, .kpis, .flow { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>Quipt to Marketplace Mapping Workflow Demo</h1>
+      <p>Live walkthrough for non-technical stakeholders: ingest specs, infer mappings, score quality, and generate XSLT.</p>
+
+      <div class="grid controls">
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="smartphones" selected>Smartphones</option>
+            <option value="laptops">Laptops</option>
+            <option value="desktops">Desktops</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="marketplace">Marketplace</label>
+          <select id="marketplace">
+            <option value="ebay" selected>eBay</option>
+            <option value="amazon">Amazon</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button id="runBtn" type="button">Run Live Demo</button>
+        </div>
+      </div>
+
+      <div class="status" id="status">Ready. Select a category and run the workflow.</div>
+    </section>
+
+    <section class="grid flow" id="flow">
+      <article class="flow-step"><h3>1. Ingest Specs</h3><p>Read Quipt XML + marketplace schema.</p></article>
+      <article class="flow-step"><h3>2. Normalize Terms</h3><p>Tokenize and harmonize attribute language.</p></article>
+      <article class="flow-step"><h3>3. Infer Mappings</h3><p>Score candidate paths with alias overrides.</p></article>
+      <article class="flow-step"><h3>4. Evaluate Quality</h3><p>Compare against manual ground truth mappings.</p></article>
+      <article class="flow-step"><h3>5. Generate XSLT</h3><p>Output transformation template for syndication.</p></article>
+    </section>
+
+    <section class="grid kpis">
+      <article class="kpi"><div class="label">Accuracy (vs Ground Truth)</div><div class="value" id="accuracy">--</div><div class="hint" id="accuracyHint">&nbsp;</div></article>
+      <article class="kpi"><div class="label">All Fields Coverage</div><div class="value" id="coverage">--</div><div class="hint" id="coverageHint">&nbsp;</div></article>
+      <article class="kpi"><div class="label">Required Fields Coverage</div><div class="value" id="requiredCoverage">--</div><div class="hint" id="requiredCoverageHint">&nbsp;</div></article>
+      <article class="kpi"><div class="label">Correct / Ground Truth</div><div class="value" id="correctGt">--</div></article>
+      <article class="kpi"><div class="label">Generated Mappings</div><div class="value" id="mappingCount">--</div></article>
+    </section>
+
+    <section class="grid results">
+      <article class="panel">
+        <h2>Field Verdicts (Top 14)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Verdict</th>
+              <th>Score</th>
+              <th>Auto Path</th>
+            </tr>
+          </thead>
+          <tbody id="verdictBody">
+            <tr><td colspan="4" style="color:#6a7d90;">No run yet.</td></tr>
+          </tbody>
+        </table>
+      </article>
+      <article class="panel">
+        <h2>Generated XSLT Preview</h2>
+        <pre id="xsltPreview">Run demo to preview generated XSLT...</pre>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const flowSteps = [...document.querySelectorAll(".flow-step")];
+    let flowInterval = null;
+
+    const el = {
+      category: document.getElementById("category"),
+      marketplace: document.getElementById("marketplace"),
+      runBtn: document.getElementById("runBtn"),
+      status: document.getElementById("status"),
+      accuracy: document.getElementById("accuracy"),
+      accuracyHint: document.getElementById("accuracyHint"),
+      coverage: document.getElementById("coverage"),
+      coverageHint: document.getElementById("coverageHint"),
+      requiredCoverage: document.getElementById("requiredCoverage"),
+      requiredCoverageHint: document.getElementById("requiredCoverageHint"),
+      correctGt: document.getElementById("correctGt"),
+      mappingCount: document.getElementById("mappingCount"),
+      verdictBody: document.getElementById("verdictBody"),
+      xsltPreview: document.getElementById("xsltPreview")
+    };
+
+    function num(v, fallback = 0) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function pct(v) { return `${num(v).toFixed(2)}%`; }
+
+    function badgeClass(verdict) {
+      if (verdict === "CORRECT") return "v-correct";
+      if (verdict === "WRONG") return "v-wrong";
+      if (verdict === "MISSING") return "v-missing";
+      return "v-other";
+    }
+
+    function esc(text) {
+      return String(text ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function resetFlow() {
+      flowSteps.forEach(s => s.classList.remove("active", "done"));
+      if (flowInterval) clearInterval(flowInterval);
+    }
+
+    function animateFlow() {
+      resetFlow();
+      const ms = 450;
+      let i = 0;
+      flowInterval = setInterval(() => {
+        if (i > 0) {
+          flowSteps[i - 1].classList.remove("active");
+          flowSteps[i - 1].classList.add("done");
+        }
+        if (i < flowSteps.length) {
+          flowSteps[i].classList.add("active");
+          i++;
+          return;
+        }
+        clearInterval(flowInterval);
+      }, ms);
+    }
+
+    function completeFlow() {
+      if (flowInterval) clearInterval(flowInterval);
+      flowSteps.forEach(s => {
+        s.classList.remove("active");
+        s.classList.add("done");
+      });
+    }
+
+    function renderVerdicts(details) {
+      if (!Array.isArray(details) || details.length === 0) {
+        el.verdictBody.innerHTML = `<tr><td colspan="4" style="color:#6a7d90;">No evaluation details returned.</td></tr>`;
+        return;
+      }
+
+      const rank = { WRONG: 0, MISSING: 1, CORRECT: 2 };
+      const rows = [...details]
+        .sort((a, b) => (rank[a.verdict] ?? 3) - (rank[b.verdict] ?? 3))
+        .slice(0, 14)
+        .map(d => `
+          <tr>
+            <td>${esc(d.marketplaceField)}</td>
+            <td><span class="badge ${badgeClass(d.verdict)}">${esc(d.verdict)}</span></td>
+            <td>${num(d.score).toFixed(3)}</td>
+            <td title="${esc(d.autoMatchedPath || "")}">${esc((d.autoMatchedPath || "--").slice(0, 72))}</td>
+          </tr>
+        `).join("");
+      el.verdictBody.innerHTML = rows;
+    }
+
+    async function runDemo() {
+      const category = el.category.value;
+      const marketplace = el.marketplace.value;
+
+      el.runBtn.disabled = true;
+      el.status.textContent = "Running workflow...";
+      animateFlow();
+
+      try {
+        const res = await fetch("/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category, marketplace })
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        completeFlow();
+
+        const accuracy = num(data.accuracy ?? data.Accuracy);
+        const coverage = num(data.coveragePercent ?? data.CoveragePercent);
+        const requiredCoverage = num(data.requiredFieldCoverage ?? data.RequiredFieldCoverage);
+        const correctMatches = num(data.correctMatches ?? data.CorrectMatches);
+        const groundTruthCount = num(data.groundTruthCount ?? data.GroundTruthCount);
+        const mappingCount = num(data.mappingCount ?? data.MappingCount);
+        const marketplaceFieldCount = num(data.marketplaceFieldCount ?? data.MarketplaceFieldCount);
+        const mappings = data.mappings ?? data.Mappings ?? [];
+        const requiredTotal = mappings.filter(m => m.isRequired === true || m.IsRequired === true).length;
+        const requiredMatched = mappings.filter(m =>
+          (m.isRequired === true || m.IsRequired === true) &&
+          !(m.isUnmatched === true || m.IsUnmatched === true)
+        ).length;
+
+        el.accuracy.textContent = pct(accuracy);
+        el.coverage.textContent = pct(coverage);
+        el.requiredCoverage.textContent = pct(requiredCoverage);
+        el.correctGt.textContent = `${correctMatches}/${groundTruthCount}`;
+        el.mappingCount.textContent = mappingCount.toString();
+        el.accuracyHint.textContent = `${correctMatches} correct out of ${groundTruthCount} benchmark fields`;
+        el.coverageHint.textContent = `${mappingCount} matched out of ${marketplaceFieldCount} total fields`;
+        el.requiredCoverageHint.textContent = `${requiredMatched} matched out of ${requiredTotal} required fields`;
+
+        renderVerdicts(data.evaluationDetails ?? data.EvaluationDetails ?? []);
+
+        const xslt = data.generatedXslt ?? data.GeneratedXslt ?? "";
+        el.xsltPreview.textContent = xslt ? xslt.slice(0, 2600) : "No XSLT returned.";
+
+        el.status.textContent = `Complete: ${category} to ${marketplace.toUpperCase()} mapped successfully.`;
+      } catch (err) {
+        resetFlow();
+        el.status.textContent = `Run failed: ${err.message}.`;
+      } finally {
+        el.runBtn.disabled = false;
+      }
+    }
+
+    el.runBtn.addEventListener("click", runDemo);
+    window.addEventListener("DOMContentLoaded", runDemo);
+  </script>
+</body>
+</html>

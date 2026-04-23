@@ -67,6 +67,7 @@ public static class FieldAliasTable
     private static readonly Dictionary<string, string> EbayPathAliases = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Brand"] = "q:Catalog/q:Brand/q:Name",
+        ["MPN"] = "q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value",
     };
 
     private static readonly Dictionary<string, string> EbayUniversal = new(StringComparer.OrdinalIgnoreCase)
@@ -111,6 +112,13 @@ public static class FieldAliasTable
 
         ["smartphones"] = new(StringComparer.OrdinalIgnoreCase)
         {
+            ["Color"]             = "EXACTCOLOR",
+            ["Model"]             = "PHONEPRODLINE",
+            ["RAM"]               = "RAMSIZE",
+            ["Connectivity"]      = "WIRELESSTECH",
+            ["Contract"]          = "LOCKEDUNLOCKED",
+            ["Features"]          = "DSPLYTYPE",
+            ["Network"]           = "LOCKEDUNLOCKED",
             ["Storage Capacity"]  = "STORSIZE",
             ["Screen Size"]       = "SCRNSIZE",
             ["Camera Resolution"] = "REARCAM",
