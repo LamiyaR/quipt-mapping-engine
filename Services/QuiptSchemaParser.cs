@@ -20,11 +20,7 @@ public class QuiptSchemaParser
         var fields = new List<Field>();
         var seenPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // ── PASS 1: Extract structured Attribute fields ──
-        // Each <Attribute> has <Code>, <Name>, <Value><a:string>...</a:string></Value>
-        // We create one Field per unique Code, with a path like:
-        //   q:.../q:Catalog/q:Attributes/q:Attribute[q:Code='MODELNBR']/q:Value/a:string
-        // and use the human-readable <Name> as the field Name for matching purposes.
+        // PASS 1: Extract structured Attribute fields.
         var attributeElements = doc.Root.Descendants(rootNs + "Attribute")
             .Where(a => a.Element(rootNs + "Code") != null);
 
@@ -36,7 +32,6 @@ public class QuiptSchemaParser
             var name = attr.Element(rootNs + "Name")?.Value?.Trim();
             if (string.IsNullOrWhiteSpace(code)) continue;
 
-            // Collect values from <Value><a:string>...</a:string></Value>
             var valueEl = attr.Element(rootNs + "Value");
             var values = new List<string>();
             if (valueEl != null)
@@ -50,9 +45,7 @@ public class QuiptSchemaParser
             }
 
             if (!attrByCode.ContainsKey(code))
-            {
                 attrByCode[code] = (name ?? code, new List<string>());
-            }
 
             attrByCode[code].Values.AddRange(values);
         }
@@ -65,12 +58,10 @@ public class QuiptSchemaParser
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            // Build a path that matches what ground truth expects
             var path = $"q:Catalog/q:Attributes/q:Attribute[q:Code='{code}']/q:Value/a:string";
 
             fields.Add(new Field
             {
-                // Use the human-readable name for matching (e.g. "Total USB-C Ports", "Processor Cores")
                 Name = name,
                 Path = path,
                 DataType = DetectDataType(distinctValues),
@@ -81,16 +72,57 @@ public class QuiptSchemaParser
             seenPaths.Add(path);
         }
 
-        // ── PASS 2: Extract regular leaf fields (non-Attribute) ──
+        // PASS 1.5: Extract typed SKU value paths.
+        // Example synthetic path: q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value
+        var skuByType = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        var skuElements = doc.Root.Descendants(rootNs + "SKU");
+        foreach (var sku in skuElements)
+        {
+            var type = sku.Element(rootNs + "Type")?.Value?.Trim();
+            var value = sku.Element(rootNs + "Value")?.Value?.Trim();
+
+            if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(value))
+                continue;
+
+            if (!skuByType.ContainsKey(type))
+                skuByType[type] = new List<string>();
+
+            skuByType[type].Add(value);
+        }
+
+        foreach (var kvp in skuByType)
+        {
+            var skuType = kvp.Key;
+            var distinctValues = kvp.Value
+                .Where(v => !string.IsNullOrWhiteSpace(v))
+                .Select(v => v.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var typedSkuPath = $"q:Catalog/q:SKUs/q:SKU[q:Type = '{skuType}']/q:Value";
+            if (seenPaths.Contains(typedSkuPath))
+                continue;
+
+            fields.Add(new Field
+            {
+                Name = skuType,
+                Path = typedSkuPath,
+                DataType = DetectDataType(distinctValues),
+                IsRequired = false,
+                EnumValues = InferEnumValues(distinctValues)
+            });
+
+            seenPaths.Add(typedSkuPath);
+        }
+
+        // PASS 2: Extract regular leaf fields (non-Attribute).
         var valueMap = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var el in doc.Root.DescendantsAndSelf())
         {
-            // Only leaf elements (no child elements)
             if (el.Elements().Any())
                 continue;
 
-            // Skip elements inside <Attributes> — already handled above
             if (IsInsideAttributes(el, rootNs))
                 continue;
 
@@ -128,9 +160,6 @@ public class QuiptSchemaParser
         return fields;
     }
 
-    /// <summary>
-    /// Returns true if the element is a descendant of an Attributes/Attribute element.
-    /// </summary>
     private static bool IsInsideAttributes(XElement el, XNamespace ns)
     {
         var current = el.Parent;

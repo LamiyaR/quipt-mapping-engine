@@ -66,28 +66,28 @@ POST /generate  { "category": "laptops", "marketplace": "amazon" }
 |-------------|-----------------|----------|-------------------|---------------------|
 | Laptops     | **100%**        | 41.18%   | 57.14%            | 11 / 11             |
 | Desktops    | **100%**        | 37.72%   | 57.14%            | 8 / 8               |
-| Smartphones | **42.86%**      | 29.48%   | 57.14%            | 3 / 7               |
+| Smartphones | **85.71%**      | 33.53%   | 57.14%            | 6 / 7               |
 
 #### eBay
 
 | Category    | Accuracy        | Coverage | Correct / GT Fields |
 |-------------|-----------------|----------|---------------------|
-| Laptops     | **81.82%**      | 90%      | 18 / 22             |
-| Desktops    | **90%**         | 90.32%   | 18 / 20             |
-| Smartphones | **5.88%**       | 64.52%   | 1 / 17              |
+| Laptops     | **86.36%**      | 90%      | 19 / 22             |
+| Desktops    | **95%**         | 93.55%   | 19 / 20             |
+| Smartphones | **100%**        | 80.65%   | 17 / 17             |
 
 **Accuracy** is computed over ground truth entries that align with actual marketplace field names (the matchable subset).
 
 **Coverage** measures what fraction of all marketplace fields received any match — a separate signal from accuracy.
 
-**Smartphones note (both marketplaces):** `Smartphones.xml` currently contains desktop-like Quipt codes (`HDSPEED`, `TOTALPCIX8`, `DESKTOPFORMFACT`, etc.) instead of real smartphone attributes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`). Low accuracy reflects a **data gap**, not a code limitation — replacing the XML with real smartphone data would immediately raise accuracy.
+Smartphone-specific codes expected by the manual templates were added to `QuiptData/Smartphones.xml`, which removed the largest data gap and significantly improved smartphone accuracy on both marketplaces.
 
 ### What's NOT Done Yet
 
-- **Smartphones.xml data gap** — file contains desktop product codes; needs to be replaced with actual smartphone attribute codes (`BATCAP`, `STORSIZE`, `DUALSIM`, `REARCAM`, `TABOS`, etc.) for meaningful smartphone accuracy on both Amazon and eBay
 - **XSLT output is basic** — generates a flat structure; doesn't handle nested JSON arrays, conditional logic, or the complex structure seen in the manual XSLT templates
 - **No unit tests** — `Tests/` folder exists with `MatchingTest.csproj` but tests are stub files, not wired up
 - **No CI/CD pipeline**
+- **Remaining gaps are XSLT sophistication, unit tests, and CI** — smartphone data availability is no longer the bottleneck
 
 ---
 
@@ -364,10 +364,10 @@ curl -X POST http://localhost:5253/generate -H "Content-Type: application/json" 
 ## Known Issues & Next Steps
 
 ### Accuracy Improvements Needed
-1. **Smartphones.xml data gap** — the file contains desktop-style codes instead of real smartphone attributes. Replacing it with actual smartphone product data would immediately unlock BATCAP, STORSIZE, DUALSIM, REARCAM, TABOS, and other smartphone-specific aliases that are already defined in `FieldAliasTable`.
-2. **eBay composite fields** — fields like `Connectivity` and `Features` map to multiple Quipt codes in the ground truth (e.g. USB ports + video outputs). The current engine picks the first match; future work could express multi-code rules.
-3. **eBay MPN field** — maps to `q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value` which is a complex path requiring a special alias mechanism not yet implemented.
-4. **Smarter matching signals** — current approach is pure heuristic. Could explore: TF-IDF weighting, embedding-based similarity, or learning weights from correct matches.
+1. **eBay composite field handling** — single-best-field matching cannot resolve fields that map to multi-code expressions in ground truth (e.g. `Connectivity`, `Features`).
+2. **Value-format parity with manual templates** — some fields expect transformed values (unit appending, concatenation, conditional output) that plain path matching cannot produce.
+3. **Smarter ranking signals** (future enhancement) — current heuristics could be improved with TF-IDF, embedding similarity, or learned weights from accepted mappings.
+4. **Regression tests for cross-category alias behavior** — alias table changes can silently break other categories; automated checks are needed.
 
 ### XSLT Generation
 - Current output is a flat `<xsl:value-of>` per field
