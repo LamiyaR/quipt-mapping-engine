@@ -622,6 +622,19 @@
 					</Value>
 				</Attribute>
 				<Attribute>
+					<Code>PCLIFESTYLE</Code>
+					<Id>0669caf9-37fa-4d3d-adfd-c7db6a0d5c70</Id>
+					<IsOption>false</IsOption>
+					<Name>Lifestyle</Name>
+					<Section>
+						<Id>52e50eed-2591-4014-8f37-2980b06e689d</Id>
+						<Name>General Information</Name>
+					</Section>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Business</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
 					<Code>TOUCH</Code>
 					<Id>9efb3da0-75a7-4fef-a3e3-b2324ae3c28b</Id>
 					<IsOption>false</IsOption>
@@ -1780,6 +1793,19 @@
 					</Value>
 				</Attribute>
 				<Attribute>
+					<Code>PCLIFESTYLE</Code>
+					<Id>0669caf9-37fa-4d3d-adfd-c7db6a0d5c70</Id>
+					<IsOption>false</IsOption>
+					<Name>Lifestyle</Name>
+					<Section>
+						<Id>52e50eed-2591-4014-8f37-2980b06e689d</Id>
+						<Name>General Information</Name>
+					</Section>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Business</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
 					<Code>TOUCH</Code>
 					<Id>9efb3da0-75a7-4fef-a3e3-b2324ae3c28b</Id>
 					<IsOption>false</IsOption>
@@ -2881,6 +2907,19 @@
 				<Attribute>
 					<Code>LIFESTYLE</Code>
 					<Id>873c508f-5f23-4639-afb1-b03133e0eff4</Id>
+					<IsOption>false</IsOption>
+					<Name>Lifestyle</Name>
+					<Section>
+						<Id>52e50eed-2591-4014-8f37-2980b06e689d</Id>
+						<Name>General Information</Name>
+					</Section>
+					<Value xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<a:string>Business</a:string>
+					</Value>
+				</Attribute>
+				<Attribute>
+					<Code>PCLIFESTYLE</Code>
+					<Id>0669caf9-37fa-4d3d-adfd-c7db6a0d5c70</Id>
 					<IsOption>false</IsOption>
 					<Name>Lifestyle</Name>
 					<Section>
