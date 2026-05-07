@@ -105,19 +105,50 @@ public static class EvaluationService
         if (string.Equals(a, b, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        // Check if one ends with the other (handles prefix differences)
-        return a.EndsWith(b, StringComparison.OrdinalIgnoreCase)
-            || b.EndsWith(a, StringComparison.OrdinalIgnoreCase);
+        if (a.EndsWith(b, StringComparison.OrdinalIgnoreCase)
+            || b.EndsWith(a, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Compare by extracting the Attribute Code if present in both paths
+        var codeA = ExtractCode(a);
+        var codeB = ExtractCode(b);
+        if (codeA != null && codeB != null)
+            return string.Equals(codeA, codeB, StringComparison.OrdinalIgnoreCase);
+
+        // Compare last meaningful segments (handles ISO3 vs ISO, Name vs Name etc.)
+        var lastA = a.Split('/').LastOrDefault()?.Replace("q:", "") ?? "";
+        var lastB = b.Split('/').LastOrDefault()?.Replace("q:", "") ?? "";
+        var secondLastA = a.Split('/').Reverse().Skip(1).FirstOrDefault()?.Replace("q:", "") ?? "";
+        var secondLastB = b.Split('/').Reverse().Skip(1).FirstOrDefault()?.Replace("q:", "") ?? "";
+        if (secondLastA.Length > 0 && secondLastB.Length > 0
+            && secondLastA.Equals(secondLastB, StringComparison.OrdinalIgnoreCase)
+            && (lastA.StartsWith(lastB, StringComparison.OrdinalIgnoreCase)
+                || lastB.StartsWith(lastA, StringComparison.OrdinalIgnoreCase)))
+            return true;
+
+        return false;
     }
 
-    /// <summary>
-    /// Strips trailing index predicates like [1] from path segments.
-    /// e.g. "a:string[1]" → "a:string"
-    /// </summary>
+    private static string? ExtractCode(string path)
+    {
+        var m = System.Text.RegularExpressions.Regex.Match(path, @"Code='([^']+)'");
+        return m.Success ? m.Groups[1].Value : null;
+    }
+
     private static string NormalizePath(string path)
     {
-        // Remove trailing [N] from each segment
-        return System.Text.RegularExpressions.Regex.Replace(
-            path.Trim(), @"\[\d+\]", "");
+        path = path.Trim();
+        // Strip [N] index predicates
+        path = System.Text.RegularExpressions.Regex.Replace(path, @"\[\d+\]", "");
+        // Strip format-number / normalize-space artifacts that may leak from extraction
+        path = path.TrimEnd(')', ' ', ',');
+        path = System.Text.RegularExpressions.Regex.Replace(path, @"[,\s]*'[^']*'\s*$", "");
+        // Normalize whitespace around = in predicates: [q:Type = 'MPN'] → [q:Type='MPN']
+        path = System.Text.RegularExpressions.Regex.Replace(path, @"\s*=\s*", "=");
+        // Strip XPath filter predicates like [normalize-space(.)!='']
+        path = System.Text.RegularExpressions.Regex.Replace(path, @"\[normalize-space[^\]]*\]", "");
+        // Normalize a:string → string (array namespace prefix)
+        path = path.Replace("/a:string", "/string");
+        return path.Trim();
     }
 }

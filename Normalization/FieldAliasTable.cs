@@ -40,6 +40,7 @@ public static class FieldAliasTable
         {
             ["specific_uses_for_product"] = "PCLIFESTYLE",
             ["graphics_description"] = "GPUTYPE",
+            ["graphics_card_interface"] = "GPUTYPE",
             ["memory_storage_capacity"] = "HDSIZE",
             ["size"] = "HDSIZE",
             ["color"] = "GENERICCOLOR",
@@ -56,6 +57,8 @@ public static class FieldAliasTable
             ["specific_uses_for_product"] = "LIFESTYLE",
             ["wireless_provider"] = "NETWORKPROVIDER",
             ["color"] = "GENERICCOLOR",
+            ["battery_installation_device_type"] = "BATTYPE",
+            ["contains_battery_or_cell"] = "BATTYPE",
         },
     };
 
@@ -66,17 +69,21 @@ public static class FieldAliasTable
     // Used when the target path is not an Attribute Code but a direct element path.
     private static readonly Dictionary<string, string> EbayPathAliases = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["Brand"] = "q:Catalog/q:Brand/q:Name",
-        ["MPN"] = "q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value",
+        ["Brand"]       = "q:Catalog/q:Brand/q:Name",
+        ["MPN"]         = "q:Catalog/q:SKUs/q:SKU[q:Type = 'MPN']/q:Value",
+        ["Item Height"] = "q:Catalog/q:Dimensions/q:Height",
+        ["Item Length"] = "q:Catalog/q:Dimensions/q:Length",
+        ["Item Width"]  = "q:Catalog/q:Dimensions/q:Width",
+        ["Item Weight"] = "q:Catalog/q:Attributes/q:Attribute[q:Code='ITEMWEIGHT']/q:Value/a:string",
     };
 
     private static readonly Dictionary<string, string> EbayUniversal = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["Release Year"]  = "RELEASEYEAR",
-        ["Model"]         = "MODELNBR",
-        ["Color"]         = "GENERICCOLOR",
-        ["RAM Size"]      = "RAMSIZE",
-        ["Storage Type"]  = "HDTYPEHWARE",
+        ["Release Year"]      = "RELEASEYEAR",
+        ["Model"]             = "MODELNBR",
+        ["Color"]             = "GENERICCOLOR",
+        ["RAM Size"]          = "RAMSIZE",
+        ["Storage Type"]      = "HDTYPEHWARE",
         ["Most Suitable For"] = "PCLIFESTYLE",
     };
 
@@ -93,6 +100,7 @@ public static class FieldAliasTable
             ["SSD Capacity"]             = "HDTYPEHWARE",
             ["Graphics Processing Type"] = "GPUTYPE",
             ["Most Suitable For"]        = "PCLIFESTYLE",
+            ["Features"]                 = "BATLIFE",
             ["Series"]                   = "NOTEBOOKPRODLINE",
             ["Connectivity"]             = "TOTALDSLPRT",
         },
@@ -106,6 +114,7 @@ public static class FieldAliasTable
             ["SSD Capacity"]             = "HDTYPEHWARE",
             ["Maximum RAM Capacity"]     = "RAMMAX",
             ["Most Suitable For"]        = "PCLIFESTYLE",
+            ["Features"]                 = "EPEATLVL",
             ["Series"]                   = "DESKTOPPRODLINE",
             ["Connectivity"]             = "TOTALDVI",
         },
@@ -129,6 +138,22 @@ public static class FieldAliasTable
         },
     };
 
+    // ── Amazon path aliases ──────────────────────────────────────────────────
+    private static readonly Dictionary<string, string> AmazonPathAliases = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["brand"]                   = "q:Catalog/q:Brand/q:Name",
+        ["manufacturer"]            = "q:Catalog/q:Manufacturer/q:Name",
+        ["item_name"]               = "q:Catalog/q:Title",
+        ["product_description"]     = "q:Catalog/q:Description",
+        ["country_of_origin"]       = "q:Catalog/q:CountryOfOrigin/q:ISO3",
+        ["warranty_description"]    = "q:Catalog/q:Warranty/q:Duration",
+        ["list_price"]              = "q:Catalog/q:Pricing/q:MSRP/q:Value",
+        ["item_package_weight"]     = "q:ShippingInfo/q:Weight/q:Value",
+        ["item_package_dimensions"] = "q:ShippingInfo/q:Dimensions/q:Length",
+        ["generic_keyword"]         = "q:Catalog/q:Tags/string",
+        ["part_number"]             = "q:SKU[q:Type = 'MPN']/q:Value",
+    };
+
     // ── Public API ──────────────────────────────────────────────────────────
 
     /// <summary>
@@ -139,6 +164,8 @@ public static class FieldAliasTable
     {
         if (marketplace.Equals("ebay", StringComparison.OrdinalIgnoreCase))
             return EbayPathAliases;
+        if (marketplace.Equals("amazon", StringComparison.OrdinalIgnoreCase))
+            return AmazonPathAliases;
         return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     }
 

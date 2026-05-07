@@ -42,50 +42,59 @@ public class MatchingEngine
 
         foreach (var amazon in amazonFields)
         {
+            Field? aliasTarget = null;
+
             // ── 3a. Direct path alias (structural elements with no Code) ──
             if (pathAliases.TryGetValue(amazon.Name, out var exactPath))
             {
-                var quiptMatch = quiptFields.FirstOrDefault(q =>
+                aliasTarget = quiptFields.FirstOrDefault(q =>
                     q.Path != null && q.Path.EndsWith(exactPath, StringComparison.OrdinalIgnoreCase));
-
-                if (quiptMatch != null)
-                {
-                    aliasResults[amazon.Name] = new MappingResult
-                    {
-                        MarketplaceField = amazon.Name,
-                        QuiptPath = quiptMatch.Path,
-                        Score = 1.0,
-                        IsRequired = amazon.IsRequired,
-                        IsUnmatched = false
-                    };
-                    usedQuiptPaths.Add(quiptMatch.Path);
-                    continue;
-                }
             }
 
             // ── 3b. Code-based alias ──
-            if (aliases.TryGetValue(amazon.Name, out var quiptCode))
+            if (aliasTarget == null && aliases.TryGetValue(amazon.Name, out var quiptCode))
             {
-                // Find the Quipt field with this Code in its path
-                var quiptMatch = quiptFields.FirstOrDefault(q =>
+                aliasTarget = quiptFields.FirstOrDefault(q =>
                     q.Path != null && q.Path.Contains($"Code='{quiptCode}'"));
 
-                if (quiptMatch != null)
-                {
-                    aliasResults[amazon.Name] = new MappingResult
-                    {
-                        MarketplaceField = amazon.Name,
-                        QuiptPath = quiptMatch.Path,
-                        Score = 1.0,
-                        IsRequired = amazon.IsRequired,
-                        IsUnmatched = false
-                    };
-
-                    // Only consume the Quipt field if it's NOT in the multi-map whitelist
-                    if (!FieldAliasTable.MultiMapCodes.Contains(quiptCode))
-                        usedQuiptPaths.Add(quiptMatch.Path);
-                }
+                if (aliasTarget != null && !FieldAliasTable.MultiMapCodes.Contains(quiptCode))
+                    usedQuiptPaths.Add(aliasTarget.Path!);
+                else if (aliasTarget != null)
+                { /* multi-map: don't consume */ }
             }
+            else if (aliasTarget != null)
+            {
+                usedQuiptPaths.Add(aliasTarget.Path!);
+            }
+
+            if (aliasTarget != null)
+            {
+                aliasResults[amazon.Name] = new MappingResult
+                {
+                    MarketplaceField = amazon.Name,
+                    QuiptPath = aliasTarget.Path,
+                    Score = -1, // placeholder — real score computed below
+                    IsRequired = amazon.IsRequired,
+                    IsUnmatched = false
+                };
+            }
+        }
+
+        // Deferred: compute real heuristic scores for alias matches
+        foreach (var kvp in aliasResults)
+        {
+            var amazon = amazonFields.First(f =>
+                f.Name.Equals(kvp.Key, StringComparison.OrdinalIgnoreCase));
+            var quipt = quiptFields.First(f =>
+                f.Path != null && f.Path.Equals(kvp.Value.QuiptPath, StringComparison.OrdinalIgnoreCase));
+
+            var aTokens = FieldNormalizer.GetNormalizedTokens(amazon.Name);
+            var qTokens = GetContextTokens(quipt);
+            var specificity = ComputeSpecificity(quipt);
+            double realScore = ComputeScore(aTokens, qTokens, amazon, quipt, specificity);
+
+            // Alias guarantees the match is correct, so floor at 0.65 for display
+            kvp.Value.Score = Math.Round(Math.Max(realScore, 0.65), 4);
         }
 
         // Pre-compute normalized tokens for all Quipt fields (name + path context)

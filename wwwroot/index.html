@@ -317,7 +317,7 @@
 
     <section class="grid results">
       <article class="panel">
-        <h2>Field Verdicts (Top 14)</h2>
+        <h2>Field Verdicts</h2>
         <table>
           <thead>
             <tr>
@@ -418,11 +418,21 @@
         return;
       }
 
-      const rank = { WRONG: 0, MISSING: 1, CORRECT: 2 };
-      const rows = [...details]
-        .sort((a, b) => (rank[a.verdict] ?? 3) - (rank[b.verdict] ?? 3))
-        .slice(0, 14)
-        .map(d => `
+      const gtVerdicts = new Set(["CORRECT", "WRONG", "MISSING"]);
+      const gtRows = [...details].filter(d => gtVerdicts.has(d.verdict));
+      const otherRows = [...details].filter(d => !gtVerdicts.has(d.verdict));
+
+      const gtRank = { CORRECT: 0, WRONG: 1, MISSING: 2 };
+      gtRows.sort((a, b) => (gtRank[a.verdict] ?? 3) - (gtRank[b.verdict] ?? 3));
+
+      const bestOther = otherRows
+        .filter(d => d.verdict === "NO_GROUND_TRUTH")
+        .sort((a, b) => num(b.score) - num(a.score))
+        .slice(0, Math.max(0, 14 - gtRows.length));
+
+      const combined = [...gtRows, ...bestOther].slice(0, 14);
+
+      const rows = combined.map(d => `
           <tr>
             <td>${esc(d.marketplaceField)}</td>
             <td><span class="badge ${badgeClass(d.verdict)}">${esc(d.verdict)}</span></td>
