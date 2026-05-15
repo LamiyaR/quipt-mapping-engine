@@ -63,5 +63,3 @@ app.MapControllers();
 
 app.MapGet("/ping", () => "pong");
 app.Run();
-
-public partial class Program { }
